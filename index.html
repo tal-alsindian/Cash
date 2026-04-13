@@ -9,7 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* جميع الأنماط كما هي (بدون تغيير) */
         :root {
             --forest-green-light: #3f8b3a;
             --forest-green-bright: #5cb85c;
@@ -28,7 +27,6 @@
             --modal-radius: 45px;
             --transition-smooth: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             --shadow-elevation: 0 25px 45px -10px rgba(30, 70, 10, 0.6), 0 0 0 2px rgba(255, 255, 255, 0.5) inset;
-
             --forest-green: #2D5A27;
             --olive-green: #4A7B3D;
             --clay-brown: #8B5A2B;
@@ -43,18 +41,16 @@
             --radius-lg: 30px;
             --radius-xl: 40px;
             --transition-fast: 0.2s ease;
-
             --black-soft: #1a1a1a;
             --green-bright: #4CAF50;
             --green-rich: #2E7D32;
             --shadow-green: rgba(76, 175, 80, 0.6);
+            --modified-orange: #FF8C00;
+            --modified-orange-dark: #b85400;
+            --modified-orange-light: rgba(255, 140, 0, 0.12);
         }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
             font-family: 'Cairo', 'Tajawal', sans-serif;
@@ -69,38 +65,21 @@
         }
 
         #animated-forest-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: linear-gradient(145deg, #1e4a1a, #3d7534, #68a355);
-            z-index: -2;
-            overflow: hidden;
+            z-index: -2; overflow: hidden;
             box-shadow: inset 0 0 150px rgba(255, 255, 255, 0.3);
         }
 
         .startup-logo {
-            width: clamp(120px, 40vw, 170px);
-            height: clamp(120px, 40vw, 170px);
-            background: var(--black-soft);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            border: 5px solid var(--green-bright);
+            width: clamp(120px, 40vw, 170px); height: clamp(120px, 40vw, 170px);
+            background: var(--black-soft); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; border: 5px solid var(--green-bright);
             box-shadow: 0 25px 45px -10px rgba(0,0,0,0.9), 0 0 0 2px var(--green-rich) inset, 0 0 0 10px rgba(76,175,80,0.2);
-            animation: gentlePulse 2.5s infinite alternate;
-            overflow: hidden;
+            animation: gentlePulse 2.5s infinite alternate; overflow: hidden;
         }
-
-        .startup-logo img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
+        .startup-logo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         @keyframes gentlePulse {
             0% { transform: scale(1); box-shadow: 0 25px 45px -10px rgba(0,0,0,0.9), 0 0 0 2px var(--green-rich) inset, 0 0 0 5px rgba(76,175,80,0.2); }
@@ -108,815 +87,388 @@
         }
 
         .header-logo-frame {
-            width: 45px;
-            height: 45px;
-            background: var(--black-soft);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            width: 45px; height: 45px; background: var(--black-soft); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
             border: 3px solid var(--green-bright);
             box-shadow: 0 25px 45px -10px rgba(0,0,0,0.9), 0 0 0 2px var(--green-rich) inset, 0 0 0 5px rgba(76,175,80,0.15);
-            overflow: hidden;
-            flex-shrink: 0;
+            overflow: hidden; flex-shrink: 0;
         }
-
-        .header-logo-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        #bg-pattern {
-            display: none;
-        }
+        .header-logo-frame img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
         #startup-screen {
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background: linear-gradient(145deg, #1f441a, var(--forest-green));
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            transition: opacity 0.6s var(--transition-smooth);
-            backdrop-filter: blur(4px);
-            padding: 16px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 10000; transition: opacity 0.6s var(--transition-smooth);
+            backdrop-filter: blur(4px); padding: 16px;
         }
-
-        #startup-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
-        }
+        #startup-screen.hidden { opacity: 0; pointer-events: none; }
 
         .startup-title {
-            font-size: clamp(2rem, 8vw, 3rem);
-            font-weight: 900;
-            color: var(--cream-white);
-            margin-bottom: 15px;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            letter-spacing: 1px;
-            text-align: center;
+            font-size: clamp(2rem, 8vw, 3rem); font-weight: 900; color: var(--cream-white);
+            margin-bottom: 15px; text-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            letter-spacing: 1px; text-align: center;
         }
 
         .activate-btn {
-            background: var(--cream-white);
-            color: var(--forest-green);
-            border: none;
-            padding: 16px 32px;
-            font-size: 1.5rem;
-            font-weight: 900;
-            border-radius: 50px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            border: 3px solid var(--sandy-beige);
-            box-shadow: var(--shadow-lg);
-            transition: all 0.3s;
-            width: auto;
-            max-width: 90%;
-            white-space: nowrap;
+            background: var(--cream-white); color: var(--forest-green); border: none;
+            padding: 16px 32px; font-size: 1.5rem; font-weight: 900; border-radius: 50px;
+            cursor: pointer; display: flex; align-items: center; gap: 12px;
+            border: 3px solid var(--sandy-beige); box-shadow: var(--shadow-lg);
+            transition: all 0.3s; width: auto; max-width: 90%; white-space: nowrap;
         }
-
-        .activate-btn:hover {
-            transform: scale(1.02) translateY(-2px);
-            background: var(--sandy-beige);
-            box-shadow: 0 30px 50px rgba(0,0,0,0.4);
-        }
-
-        .activate-btn i {
-            font-size: 1.4rem;
-        }
+        .activate-btn:hover { transform: scale(1.02) translateY(-2px); background: var(--sandy-beige); box-shadow: 0 30px 50px rgba(0,0,0,0.4); }
+        .activate-btn i { font-size: 1.4rem; }
 
         #main-content {
-            max-width: 100%;
-            margin: 0 auto;
-            padding: 12px;
-            opacity: 0;
-            transition: opacity 0.5s;
-            position: relative;
-            z-index: 1;
+            max-width: 100%; margin: 0 auto; padding: 12px; opacity: 0;
+            transition: opacity 0.5s; position: relative; z-index: 1;
         }
 
         .kitchen-header {
-            background: rgba(255, 249, 240, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 16px;
-            margin-bottom: 20px;
-            border: 2px solid var(--clay-brown);
-            box-shadow: var(--shadow-md);
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            gap: 16px;
+            background: rgba(255, 249, 240, 0.95); backdrop-filter: blur(10px);
+            border-radius: 30px; padding: 16px; margin-bottom: 20px;
+            border: 2px solid var(--clay-brown); box-shadow: var(--shadow-md);
+            display: flex; flex-direction: column; align-items: stretch; gap: 16px;
         }
 
-        .header-logo {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            justify-content: center;
-        }
+        .header-logo { display: flex; align-items: center; gap: 12px; justify-content: center; }
+        .header-logo h1 { color: var(--forest-green); font-size: 1.3rem; font-weight: 900; letter-spacing: 0.5px; line-height: 1.3; }
 
-        .header-logo h1 {
-            color: var(--forest-green);
-            font-size: 1.3rem;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-            line-height: 1.3;
-        }
-
-        .stats {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
+        .stats { display: flex; gap: 12px; justify-content: center; }
 
         .stat-card {
             background: linear-gradient(145deg, var(--forest-green), #1f441a);
-            padding: 10px 16px;
-            border-radius: 25px;
-            color: var(--cream-white);
-            text-align: center;
-            border: 2px solid var(--sandy-beige);
-            box-shadow: var(--shadow-sm);
-            min-width: 100px;
-            flex: 1;
+            padding: 10px 16px; border-radius: 25px; color: var(--cream-white);
+            text-align: center; border: 2px solid var(--sandy-beige);
+            box-shadow: var(--shadow-sm); min-width: 100px; flex: 1;
         }
+        .stat-number { font-size: 1.8rem; font-weight: 900; line-height: 1.2; }
+        .stat-card div:last-child { font-size: 0.8rem; font-weight: 600; opacity: 0.9; }
 
-        .stat-number {
-            font-size: 1.8rem;
-            font-weight: 900;
-            line-height: 1.2;
-        }
-
-        .stat-card div:last-child {
-            font-size: 0.8rem;
-            font-weight: 600;
-            opacity: 0.9;
-        }
-
-        .controls {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-            align-items: center;
-        }
+        .controls { display: flex; gap: 12px; justify-content: center; align-items: center; }
 
         .control-btn {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: var(--forest-green);
-            color: var(--cream-white);
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            border: 2px solid var(--sandy-beige);
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: var(--shadow-sm);
-            position: relative;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--forest-green); color: var(--cream-white); border: none;
+            font-size: 1.2rem; cursor: pointer; border: 2px solid var(--sandy-beige);
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+            box-shadow: var(--shadow-sm); position: relative;
         }
+        .control-btn:hover { transform: rotate(180deg) scale(1.05); background: var(--clay-brown); border-color: var(--cream-white); }
 
-        .control-btn:hover {
-            transform: rotate(180deg) scale(1.05);
-            background: var(--clay-brown);
-            border-color: var(--cream-white);
-        }
+        .spinner { animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        .spinner {
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .kitchen-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
+        .kitchen-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
 
         .kitchen-tab {
-            background: var(--cream-white);
-            border: 2px solid var(--forest-green);
-            padding: 12px 20px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 1rem;
-            color: var(--forest-green);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.25s;
-            box-shadow: var(--shadow-sm);
-            flex: 1 1 auto;
-            justify-content: center;
+            background: var(--cream-white); border: 2px solid var(--forest-green);
+            padding: 12px 20px; border-radius: 40px; font-weight: 700; font-size: 1rem;
+            color: var(--forest-green); cursor: pointer; display: flex; align-items: center;
+            gap: 8px; transition: all 0.25s; box-shadow: var(--shadow-sm);
+            flex: 1 1 auto; justify-content: center;
         }
+        .kitchen-tab.active { background: var(--forest-green); color: var(--cream-white); border-color: var(--sandy-beige); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .kitchen-tab .badge { background: var(--clay-brown); color: var(--cream-white); padding: 4px 10px; border-radius: 30px; font-size: 0.8rem; font-weight: 700; transition: 0.2s; }
+        .kitchen-tab.active .badge { background: var(--cream-white); color: var(--forest-green); }
 
-        .kitchen-tab.active {
-            background: var(--forest-green);
-            color: var(--cream-white);
-            border-color: var(--sandy-beige);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-md);
-        }
-
-        .kitchen-tab .badge {
-            background: var(--clay-brown);
-            color: var(--cream-white);
-            padding: 4px 10px;
-            border-radius: 30px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            transition: 0.2s;
-        }
-
-        .kitchen-tab.active .badge {
-            background: var(--cream-white);
-            color: var(--forest-green);
-        }
-
-        .orders-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
+        .orders-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
 
         .order-card {
-            background: var(--cream-white);
-            border-radius: 28px;
+            background: var(--cream-white); border-radius: 28px; overflow: hidden;
+            border: 2px solid var(--clay-brown); box-shadow: var(--shadow-md);
+            transition: all 0.3s; display: flex; flex-direction: column; animation: cardFade 0.4s;
+        }
+
+        /* ===== بطاقة الطلب المعدَّل - برتقالية ===== */
+        .order-card.modified {
+            border: 3px solid var(--modified-orange) !important;
+            box-shadow: 0 0 0 4px rgba(255,140,0,0.18), var(--shadow-md) !important;
+            animation: modifiedCardPulse 2.5s ease infinite alternate;
+        }
+        @keyframes modifiedCardPulse {
+            0% { box-shadow: 0 0 0 4px rgba(255,140,0,0.18), var(--shadow-md); }
+            100% { box-shadow: 0 0 0 8px rgba(255,140,0,0.32), 0 20px 40px rgba(255,140,0,0.2); }
+        }
+
+        .order-card.modified .order-header {
+            background: linear-gradient(145deg, #b85400, #d96800, #FF8C00) !important;
+            position: relative; overflow: hidden;
+        }
+        .order-card.modified .order-header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.07) 8px, rgba(255,255,255,0.07) 16px);
+            pointer-events: none;
+        }
+
+        .modified-badge {
+            background: rgba(255,255,255,0.25); color: white;
+            border: 2px solid rgba(255,255,255,0.55); border-radius: 30px;
+            padding: 3px 10px; font-size: 0.78rem; font-weight: 900;
+            display: flex; align-items: center; gap: 4px;
+            animation: badgeWiggle 1.8s ease infinite; backdrop-filter: blur(4px);
+        }
+        @keyframes badgeWiggle { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+
+        .order-card.modified .order-footer {
+            background: rgba(255, 140, 0, 0.08) !important;
+            border-top-color: var(--modified-orange) !important;
+        }
+        .order-card.modified .table-info {
+            background: rgba(255, 140, 0, 0.1);
+            border-color: var(--modified-orange);
+        }
+        .order-card.modified .table-number-large { color: var(--modified-orange-dark); }
+        .order-card.modified .table-number-large i { color: var(--modified-orange); }
+
+        /* ===== قسم "التعديلات الجديدة" ===== */
+        .new-modifications-section {
+            margin: 14px 0 6px;
+            border-radius: 18px;
             overflow: hidden;
-            border: 2px solid var(--clay-brown);
-            box-shadow: var(--shadow-md);
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            animation: cardFade 0.4s;
+            border: 2.5px solid var(--modified-orange);
+            box-shadow: 0 4px 16px rgba(255,140,0,0.18);
+            animation: modSectionAppear 0.5s cubic-bezier(0.18,0.89,0.32,1.2);
+        }
+        @keyframes modSectionAppear {
+            from { opacity: 0; transform: translateY(10px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .order-card.hidden-by-tab {
-            display: none !important;
+        .new-modifications-header {
+            background: linear-gradient(135deg, #b85400, #d96800, #FF8C00);
+            padding: 10px 14px;
+            display: flex; align-items: center; gap: 8px;
+            position: relative; overflow: hidden;
+        }
+        .new-modifications-header::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(255,255,255,0.06) 6px, rgba(255,255,255,0.06) 12px);
+        }
+        .new-modifications-header-icon {
+            width: 30px; height: 30px;
+            background: rgba(255,255,255,0.22);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; color: white;
+            border: 2px solid rgba(255,255,255,0.5);
+            flex-shrink: 0; position: relative; z-index: 1;
+            animation: modIconSpin 2s ease infinite alternate;
+        }
+        @keyframes modIconSpin { 0%{transform:rotate(-12deg) scale(1)} 100%{transform:rotate(12deg) scale(1.1)} }
+
+        .new-modifications-title {
+            font-size: 1rem; font-weight: 900; color: white;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+            position: relative; z-index: 1; letter-spacing: 0.3px;
+        }
+        .new-modifications-count {
+            margin-right: auto;
+            background: rgba(255,255,255,0.25);
+            color: white; border-radius: 20px;
+            padding: 2px 10px; font-size: 0.78rem; font-weight: 900;
+            border: 1.5px solid rgba(255,255,255,0.4);
+            position: relative; z-index: 1;
         }
 
-        .order-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-            border-color: var(--forest-green);
+        .new-modifications-body {
+            background: #fff8ef;
+            padding: 12px 14px;
         }
 
-        @keyframes cardFade {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .mod-item {
+            display: flex; align-items: center; gap: 8px;
+            padding: 8px 10px; margin-bottom: 8px;
+            background: white;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,140,0,0.25);
+            box-shadow: 0 2px 8px rgba(255,140,0,0.08);
         }
+        .mod-item:last-child { margin-bottom: 0; }
+
+        .mod-item-icon {
+            width: 28px; height: 28px;
+            background: linear-gradient(135deg, #FF8C00, #d96800);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; color: white; flex-shrink: 0;
+        }
+        .mod-item-name {
+            flex: 1; font-size: 0.9rem; font-weight: 700;
+            color: var(--forest-green); overflow: hidden;
+            text-overflow: ellipsis; white-space: nowrap;
+        }
+        .mod-item-qty {
+            background: var(--modified-orange); color: white;
+            border-radius: 10px; padding: 2px 9px;
+            font-size: 0.78rem; font-weight: 900; flex-shrink: 0;
+        }
+        .mod-item-price {
+            font-size: 0.82rem; font-weight: 800;
+            color: var(--modified-orange-dark); flex-shrink: 0;
+        }
+
+        /* تغيير الكمية */
+        .mod-qty-change {
+            display: flex; align-items: center; gap: 6px;
+            padding: 7px 10px; margin-bottom: 8px;
+            background: #fff3e0;
+            border-radius: 12px;
+            border: 1.5px dashed rgba(255,140,0,0.4);
+        }
+        .mod-qty-change:last-child { margin-bottom: 0; }
+        .mod-qty-icon {
+            width: 26px; height: 26px;
+            background: linear-gradient(135deg, #e67600, #b85400);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; color: white; flex-shrink: 0;
+        }
+        .mod-qty-name { flex: 1; font-size: 0.85rem; font-weight: 700; color: #7a4000; }
+        .mod-qty-arrow { font-size: 0.75rem; color: #b85400; font-weight: 900; }
+        .mod-qty-old { background: rgba(0,0,0,0.1); border-radius: 8px; padding: 1px 7px; font-size: 0.78rem; color: #888; text-decoration: line-through; }
+        .mod-qty-new { background: var(--modified-orange); color: white; border-radius: 8px; padding: 1px 7px; font-size: 0.78rem; font-weight: 900; }
+
+        /* صنف محذوف */
+        .mod-removed {
+            display: flex; align-items: center; gap: 8px;
+            padding: 7px 10px; margin-bottom: 8px;
+            background: #fff0f0;
+            border-radius: 12px;
+            border: 1.5px dashed rgba(180,30,30,0.3);
+        }
+        .mod-removed:last-child { margin-bottom: 0; }
+        .mod-removed-icon {
+            width: 26px; height: 26px;
+            background: linear-gradient(135deg, #cc3300, #991f00);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.7rem; color: white; flex-shrink: 0;
+        }
+        .mod-removed-name { flex: 1; font-size: 0.85rem; font-weight: 700; color: #991f00; text-decoration: line-through; }
+        .mod-removed-label { font-size: 0.75rem; background: #cc3300; color: white; border-radius: 8px; padding: 1px 8px; font-weight: 800; }
+
+        .order-card.hidden-by-tab { display: none !important; }
+        .order-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--forest-green); }
+        .order-card.modified:hover { border-color: var(--modified-orange) !important; }
+
+        @keyframes cardFade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
         .order-header {
             background: linear-gradient(145deg, var(--forest-green), #1f441a);
-            color: var(--cream-white);
-            padding: 14px 16px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .order-id {
-            font-size: 1.2rem;
-            font-weight: 900;
-            letter-spacing: 0.5px;
-        }
-
-        .order-time {
-            background: rgba(255,255,255,0.15);
-            padding: 5px 12px;
-            border-radius: 40px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            backdrop-filter: blur(4px);
-        }
-
-        .order-body {
-            padding: 16px;
-        }
-
-        .table-info {
-            background: var(--sandy-beige);
-            padding: 12px;
-            border-radius: 18px;
-            margin-bottom: 16px;
-            text-align: center;
-            border: 2px solid var(--clay-brown);
-        }
-
-        .table-number-large {
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--forest-green);
-            line-height: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-
-        .table-number-large i {
-            font-size: 1.8rem;
-            color: var(--clay-brown);
-        }
-
-        .order-items {
-            background: rgba(45,90,39,0.03);
-            border-radius: 18px;
-            padding: 16px;
-            margin-bottom: 12px;
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed rgba(45,90,39,0.2);
-            font-weight: 600;
-            gap: 8px;
-        }
-
-        .item-details {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-            flex: 2;
-        }
-
-        .item-name {
-            font-size: 0.95rem;
-            font-weight: 700;
-            color: var(--forest-green);
-        }
-
-        .item-price-info {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
-            color: var(--clay-brown);
-            flex-wrap: wrap;
-        }
-
-        .item-unit-price {
-            background: rgba(139,90,43,0.1);
-            padding: 2px 8px;
-            border-radius: 12px;
-        }
-
-        .item-separator {
-            color: var(--forest-green);
-            font-weight: 700;
-        }
-
-        .item-quantity {
-            background: var(--forest-green);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.75rem;
-        }
-
-        .item-total {
-            font-weight: 900;
-            color: var(--forest-green);
-            background: rgba(45,90,39,0.1);
-            padding: 4px 10px;
-            border-radius: 18px;
-            white-space: nowrap;
-            font-size: 0.9rem;
-        }
-
-        .order-total {
-            font-size: 1.2rem;
-            font-weight: 900;
-            color: var(--forest-green);
-            text-align: left;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 2px solid var(--sandy-beige);
-        }
-
-        .status-badge {
-            display: inline-block;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-top: 12px;
-        }
-
-        .status-preparing {
-            background: rgba(74,123,61,0.15);
-            color: var(--forest-green);
-            border: 2px solid var(--forest-green);
-        }
-
-        .status-completed {
-            background: rgba(139,90,43,0.15);
-            color: var(--clay-brown);
-            border: 2px solid var(--clay-brown);
-        }
-
-        .order-notes {
-            background: #fff3cd;
-            border-right: 6px solid #856404;
-            padding: 12px 14px;
-            border-radius: 14px;
-            margin: 12px 0 5px;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-
-        .order-footer {
-            padding: 16px;
-            background: var(--sandy-beige);
-            display: flex;
-            gap: 10px;
-            border-top: 2px solid var(--clay-brown);
-            margin-top: auto;
-            flex-wrap: wrap;
-        }
-
-        .action-btn {
-            flex: 1 1 auto;
-            padding: 12px 8px;
-            border: none;
-            border-radius: 18px;
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-            min-width: 90px;
-        }
-
-        .btn-done {
-            background: var(--forest-green);
-        }
-
-        .btn-print {
-            background: var(--clay-brown);
-        }
-
-        .btn-delete {
-            background: #b33;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 18px rgba(0,0,0,0.2);
-            border-color: var(--cream-white);
-        }
-
-        .empty-state {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 60px 16px;
-            background: var(--cream-white);
-            border-radius: 30px;
-            border: 3px solid var(--clay-brown);
-            box-shadow: var(--shadow-md);
-        }
-
-        .empty-state i {
-            font-size: 5rem;
-            color: var(--forest-green);
-            opacity: 0.5;
-            margin-bottom: 16px;
-        }
-
-        .empty-state h3 {
-            font-size: 1.6rem;
-            color: var(--forest-green);
-        }
-
-        .empty-state p {
-            font-size: 1rem;
-        }
-
-        .popup-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(12px);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
-        }
-
-        .popup-overlay.active {
-            display: flex;
-        }
-
-        .order-popup {
-            background: var(--cream-white);
-            border-radius: 40px;
-            width: 100%;
-            max-width: 360px;
-            border: 3px solid var(--clay-brown);
-            box-shadow: var(--shadow-lg), 0 0 0 8px rgba(245,230,211,0.3);
-            animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2);
-            overflow: hidden;
-        }
-
-        @keyframes popIn {
-            0% { opacity: 0; transform: scale(0.8) translateY(30px); }
-            100% { opacity: 1; transform: scale(1) translateY(0); }
-        }
-
-        .popup-header {
-            background: linear-gradient(145deg, var(--forest-green), #1a3e16);
-            color: white;
-            padding: 14px 18px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .popup-header-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .popup-header-icon {
-            width: 42px;
-            height: 42px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.4rem;
-            border: 2px solid var(--sandy-beige);
-        }
-
-        .popup-header-text h2 {
-            font-size: 1.2rem;
-            font-weight: 900;
-            margin-bottom: 2px;
-        }
-
-        .popup-header-text p {
-            font-size: 0.75rem;
-            opacity: 0.9;
-        }
-
-        .popup-close {
-            width: 34px;
-            height: 34px;
-            background: rgba(255,255,255,0.2);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .popup-close:hover {
-            background: rgba(255,255,255,0.4);
-            transform: rotate(90deg);
-        }
-
-        .popup-body {
-            padding: 20px;
-        }
-
-        .order-id-badge {
-            background: var(--sandy-beige);
-            border: 2px dashed var(--clay-brown);
-            border-radius: 50px;
-            padding: 8px 12px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            justify-content: center;
-        }
-
-        .order-id-badge i {
-            color: var(--forest-green);
-            font-size: 1rem;
-        }
-
-        .order-id-badge span {
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: var(--forest-green);
-        }
-
-        .popup-table-card {
-            background: linear-gradient(145deg, var(--forest-green), #1f441a);
-            color: white;
-            padding: 24px 16px;
-            border-radius: 32px;
-            text-align: center;
-            margin-bottom: 16px;
-            border: 2px solid var(--sandy-beige);
-        }
-
-        .popup-table-number {
-            font-size: 4rem;
-            font-weight: 900;
-            line-height: 1;
-            margin-bottom: 8px;
-            text-shadow: 0 5px 10px rgba(0,0,0,0.3);
-        }
-
-        .popup-table-label {
-            font-size: 1rem;
-            opacity: 0.9;
-            font-weight: 600;
-        }
-
-        .popup-info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 16px;
-        }
-
-        .info-card {
-            background: var(--sandy-beige);
-            padding: 12px 6px;
-            border-radius: 22px;
-            text-align: center;
-            border: 2px solid var(--clay-brown);
-        }
-
-        .info-icon {
-            color: var(--forest-green);
-            font-size: 1.3rem;
-            margin-bottom: 4px;
-        }
-
-        .info-label {
-            font-size: 0.65rem;
-            color: var(--clay-brown);
-            font-weight: 800;
-            text-transform: uppercase;
-        }
-
-        .info-value {
-            font-size: 1.1rem;
-            font-weight: 900;
-            color: var(--forest-green);
-        }
-
-        .popup-total-card {
-            background: linear-gradient(145deg, var(--forest-green), #1f441a);
-            color: white;
-            padding: 14px 18px;
-            border-radius: 28px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 1.2rem;
-            font-weight: 900;
-            margin-bottom: 16px;
-            border: 2px solid var(--sandy-beige);
-        }
-
-        .popup-timer {
-            background: var(--sandy-beige);
-            border-radius: 28px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
-            border: 2px solid var(--clay-brown);
-        }
-
-        .timer-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            color: var(--forest-green);
-            font-weight: 700;
-            font-size: 0.9rem;
-        }
-
-        .timer-display {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: var(--forest-green);
-            font-family: monospace;
-            letter-spacing: 2px;
-        }
-
-        .timer-progress {
-            height: 8px;
-            background: rgba(0,0,0,0.1);
-            border-radius: 20px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: var(--forest-green);
-            width: 0%;
-            transition: width 1s linear;
-            border-radius: 20px;
-        }
-
-        .receive-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(145deg, var(--forest-green), #1a3e16);
-            color: white;
-            border: none;
-            border-radius: 36px;
-            font-size: 1.1rem;
-            font-weight: 900;
-            cursor: pointer;
-            border: 2px solid var(--sandy-beige);
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .receive-btn:active {
-            transform: scale(0.97);
-        }
-
-        .receive-btn:hover {
-            background: #1f5a1a;
-            box-shadow: 0 8px 18px rgba(0,0,0,0.3);
-        }
-
-        .notification {
-            position: fixed;
-            top: 15px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--forest-green);
-            color: white;
-            padding: 12px 24px;
-            border-radius: 50px;
-            box-shadow: var(--shadow-lg);
-            z-index: 10001;
-            border: 2px solid var(--sandy-beige);
-            animation: slideDown 0.3s;
-            font-size: 0.9rem;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 90%;
-            max-width: 340px;
-            justify-content: center;
-        }
-
-        @keyframes slideDown {
-            from { transform: translate(-50%, -100%); opacity: 0; }
-            to { transform: translate(-50%, 0); opacity: 1; }
-        }
+            color: var(--cream-white); padding: 14px 16px;
+            display: flex; justify-content: space-between; align-items: center; gap: 8px;
+        }
+        .order-id { font-size: 1.2rem; font-weight: 900; letter-spacing: 0.5px; }
+        .order-time { background: rgba(255,255,255,0.15); padding: 5px 12px; border-radius: 40px; font-size: 0.85rem; font-weight: 600; backdrop-filter: blur(4px); white-space: nowrap; }
+
+        .order-body { padding: 16px; }
+
+        .table-info { background: var(--sandy-beige); padding: 12px; border-radius: 18px; margin-bottom: 16px; text-align: center; border: 2px solid var(--clay-brown); }
+        .table-number-large { font-size: 2.5rem; font-weight: 900; color: var(--forest-green); line-height: 1; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .table-number-large i { font-size: 1.8rem; color: var(--clay-brown); }
+
+        .order-items { background: rgba(45,90,39,0.03); border-radius: 18px; padding: 16px; margin-bottom: 12px; }
+        .order-item { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px dashed rgba(45,90,39,0.2); font-weight: 600; gap: 8px; }
+        .item-details { display: flex; flex-direction: column; gap: 4px; flex: 2; }
+        .item-name { font-size: 0.95rem; font-weight: 700; color: var(--forest-green); }
+        .item-price-info { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; color: var(--clay-brown); flex-wrap: wrap; }
+        .item-unit-price { background: rgba(139,90,43,0.1); padding: 2px 8px; border-radius: 12px; }
+        .item-separator { color: var(--forest-green); font-weight: 700; }
+        .item-quantity { background: var(--forest-green); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; }
+        .item-total { font-weight: 900; color: var(--forest-green); background: rgba(45,90,39,0.1); padding: 4px 10px; border-radius: 18px; white-space: nowrap; font-size: 0.9rem; }
+        .order-total { font-size: 1.2rem; font-weight: 900; color: var(--forest-green); text-align: left; margin-top: 12px; padding-top: 12px; border-top: 2px solid var(--sandy-beige); }
+
+        .status-badge { display: inline-block; padding: 6px 16px; border-radius: 40px; font-weight: 700; font-size: 0.9rem; margin-top: 12px; }
+        .status-preparing { background: rgba(74,123,61,0.15); color: var(--forest-green); border: 2px solid var(--forest-green); }
+        .status-completed { background: rgba(139,90,43,0.15); color: var(--clay-brown); border: 2px solid var(--clay-brown); }
+        .status-modified { background: rgba(255,140,0,0.12); color: var(--modified-orange-dark); border: 2px solid var(--modified-orange); }
+
+        .order-notes { background: #fff3cd; border-right: 6px solid #856404; padding: 12px 14px; border-radius: 14px; margin: 12px 0 5px; font-size: 0.9rem; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+
+        .order-footer { padding: 16px; background: var(--sandy-beige); display: flex; gap: 10px; border-top: 2px solid var(--clay-brown); margin-top: auto; flex-wrap: wrap; }
+
+        .action-btn { flex: 1 1 auto; padding: 12px 8px; border: none; border-radius: 18px; font-weight: 700; font-size: 0.9rem; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; border: 2px solid transparent; min-width: 90px; }
+        .btn-done { background: var(--forest-green); }
+        .btn-print { background: var(--clay-brown); }
+        .btn-delete { background: #b33; }
+        .action-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.2); border-color: var(--cream-white); }
+
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 16px; background: var(--cream-white); border-radius: 30px; border: 3px solid var(--clay-brown); box-shadow: var(--shadow-md); }
+        .empty-state i { font-size: 5rem; color: var(--forest-green); opacity: 0.5; margin-bottom: 16px; }
+        .empty-state h3 { font-size: 1.6rem; color: var(--forest-green); }
+        .empty-state p { font-size: 1rem; }
+
+        .popup-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(12px); z-index: 9999; display: none; justify-content: center; align-items: center; padding: 16px; }
+        .popup-overlay.active { display: flex; }
+
+        .order-popup { background: var(--cream-white); border-radius: 40px; width: 100%; max-width: 360px; border: 3px solid var(--clay-brown); box-shadow: var(--shadow-lg), 0 0 0 8px rgba(245,230,211,0.3); animation: popIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.2); overflow: hidden; }
+        @keyframes popIn { 0% { opacity: 0; transform: scale(0.8) translateY(30px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+
+        .popup-header { background: linear-gradient(145deg, var(--forest-green), #1a3e16); color: white; padding: 14px 18px; display: flex; align-items: center; justify-content: space-between; }
+        .popup-header-content { display: flex; align-items: center; gap: 10px; }
+        .popup-header-icon { width: 42px; height: 42px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; border: 2px solid var(--sandy-beige); }
+        .popup-header-text h2 { font-size: 1.2rem; font-weight: 900; margin-bottom: 2px; }
+        .popup-header-text p { font-size: 0.75rem; opacity: 0.9; }
+        .popup-close { width: 34px; height: 34px; background: rgba(255,255,255,0.2); border: none; border-radius: 50%; color: white; font-size: 0.9rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; }
+        .popup-close:hover { background: rgba(255,255,255,0.4); transform: rotate(90deg); }
+
+        .popup-body { padding: 20px; }
+        .order-id-badge { background: var(--sandy-beige); border: 2px dashed var(--clay-brown); border-radius: 50px; padding: 8px 12px; display: flex; align-items: center; gap: 8px; margin-bottom: 16px; justify-content: center; }
+        .order-id-badge i { color: var(--forest-green); font-size: 1rem; }
+        .order-id-badge span { font-size: 1.1rem; font-weight: 900; color: var(--forest-green); }
+
+        .popup-table-card { background: linear-gradient(145deg, var(--forest-green), #1f441a); color: white; padding: 24px 16px; border-radius: 32px; text-align: center; margin-bottom: 16px; border: 2px solid var(--sandy-beige); }
+        .popup-table-number { font-size: 4rem; font-weight: 900; line-height: 1; margin-bottom: 8px; text-shadow: 0 5px 10px rgba(0,0,0,0.3); }
+        .popup-table-label { font-size: 1rem; opacity: 0.9; font-weight: 600; }
+
+        .popup-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+        .info-card { background: var(--sandy-beige); padding: 12px 6px; border-radius: 22px; text-align: center; border: 2px solid var(--clay-brown); }
+        .info-icon { color: var(--forest-green); font-size: 1.3rem; margin-bottom: 4px; }
+        .info-label { font-size: 0.65rem; color: var(--clay-brown); font-weight: 800; text-transform: uppercase; }
+        .info-value { font-size: 1.1rem; font-weight: 900; color: var(--forest-green); }
+
+        .popup-timer { background: var(--sandy-beige); border-radius: 28px; padding: 14px 16px; margin-bottom: 16px; border: 2px solid var(--clay-brown); }
+        .timer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; color: var(--forest-green); font-weight: 700; font-size: 0.9rem; }
+        .timer-display { font-size: 1.6rem; font-weight: 900; color: var(--forest-green); font-family: monospace; letter-spacing: 2px; }
+        .timer-progress { height: 8px; background: rgba(0,0,0,0.1); border-radius: 20px; overflow: hidden; margin-top: 8px; }
+        .progress-fill { height: 100%; background: var(--forest-green); width: 0%; transition: width 1s linear; border-radius: 20px; }
+
+        .receive-btn { width: 100%; padding: 16px; background: linear-gradient(145deg, var(--forest-green), #1a3e16); color: white; border: none; border-radius: 36px; font-size: 1.1rem; font-weight: 900; cursor: pointer; border: 2px solid var(--sandy-beige); transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .receive-btn:active { transform: scale(0.97); }
+        .receive-btn:hover { background: #1f5a1a; box-shadow: 0 8px 18px rgba(0,0,0,0.3); }
+
+        .notification { position: fixed; top: 15px; left: 50%; transform: translateX(-50%); background: var(--forest-green); color: white; padding: 12px 24px; border-radius: 50px; box-shadow: var(--shadow-lg); z-index: 10001; border: 2px solid var(--sandy-beige); animation: slideDown 0.3s; font-size: 0.9rem; font-weight: 700; display: flex; align-items: center; gap: 10px; width: 90%; max-width: 340px; justify-content: center; }
+        @keyframes slideDown { from { transform: translate(-50%, -100%); opacity: 0; } to { transform: translate(-50%, 0); opacity: 1; } }
+
+        /* بوبأب التعديل - برتقالي */
+        .modify-popup-overlay { z-index: 9998; }
+        .modify-popup { border: 3px solid #FF8C00 !important; box-shadow: var(--shadow-lg), 0 0 0 8px rgba(255,200,80,0.18) !important; }
+        .modify-header { background: linear-gradient(145deg, #b85400, #d96800, #FF8C00) !important; position: relative; overflow: hidden; }
+        .modify-header::before { content:''; position:absolute; inset:0; background:repeating-linear-gradient(45deg,transparent,transparent 8px,rgba(255,255,255,0.06) 8px,rgba(255,255,255,0.06) 16px); pointer-events:none; }
+        .modify-icon { background: rgba(255,255,255,0.22) !important; border-color: rgba(255,255,255,0.55) !important; animation: modifyIconWiggle 1.4s ease infinite; }
+        @keyframes modifyIconWiggle { 0%,100%{transform:rotate(-10deg) scale(1)} 50%{transform:rotate(10deg) scale(1.12)} }
+        .modify-badge { background: rgba(255,140,0,0.1) !important; border-color: #FF8C00 !important; }
+        .modify-badge i { color: #FF8C00 !important; }
+        .modify-badge span { color: #b85400 !important; }
+        .modify-table-card { background: linear-gradient(145deg, #b85400, #d96800) !important; border-color: rgba(255,210,100,0.45) !important; }
+        .modify-receive-btn { background: linear-gradient(145deg, #b85400, #d96800, #FF8C00) !important; border-color: rgba(255,210,80,0.55) !important; }
+        .modify-receive-btn:hover { background: linear-gradient(145deg, #8f4200, #b85400) !important; }
+        .modify-items-preview { background: rgba(255,140,0,0.07); border: 2px solid rgba(255,140,0,0.28); border-radius: 20px; padding: 14px; margin-bottom: 14px; max-height: 155px; overflow-y: auto; }
+        .modify-items-preview .preview-title { font-size: 0.8rem; font-weight: 800; color: #b85400; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+        .modify-items-preview .preview-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px dashed rgba(255,140,0,0.22); font-size: 0.85rem; color: var(--forest-green); font-weight: 600; gap: 6px; }
+        .modify-items-preview .preview-item:last-child { border-bottom: none; }
+        .modify-items-preview .preview-item .p-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .modify-items-preview .preview-item .p-qty { background: #FF8C00; color: white; border-radius: 10px; padding: 1px 7px; font-size: 0.75rem; font-weight: 800; flex-shrink: 0; }
+        .modify-items-preview .preview-item .p-price { color: #b85400; font-weight: 800; font-size: 0.82rem; flex-shrink: 0; }
+        .modify-notes-preview { background: #fff8e6; border-right: 4px solid #FF8C00; padding: 8px 12px; border-radius: 10px; margin-top: 8px; font-size: 0.82rem; color: #7a4000; font-weight: 600; }
 
         @media (max-width: 380px) {
-            .header-logo h1 {
-                font-size: 1.1rem;
-            }
-            .stat-number {
-                font-size: 1.5rem;
-            }
-            .kitchen-tab {
-                padding: 10px 12px;
-                font-size: 0.9rem;
-            }
-            .order-id {
-                font-size: 1rem;
-            }
-            .table-number-large {
-                font-size: 2.2rem;
-            }
+            .header-logo h1 { font-size: 1.1rem; }
+            .stat-number { font-size: 1.5rem; }
+            .kitchen-tab { padding: 10px 12px; font-size: 0.9rem; }
+            .order-id { font-size: 1rem; }
+            .table-number-large { font-size: 2.2rem; }
         }
     </style>
 </head>
@@ -942,7 +494,6 @@
                 </div>
                 <h1>شاشة الكاشير • تل السنديان</h1>
             </div>
-            
             <div class="stats">
                 <div class="stat-card">
                     <div class="stat-number" id="preparingCount">0</div>
@@ -953,7 +504,6 @@
                     <div>مكتمل</div>
                 </div>
             </div>
-            
             <div class="controls">
                 <button class="control-btn" id="soundToggle">
                     <i class="fas fa-volume-up"></i>
@@ -980,34 +530,28 @@
         <div id="ordersContainer" class="orders-grid"></div>
     </div>
 
+    <!-- بوبأب الطلب الجديد (أخضر) -->
     <div id="popupOverlay" class="popup-overlay">
         <div class="order-popup">
             <div class="popup-header">
                 <div class="popup-header-content">
-                    <div class="popup-header-icon">
-                        <i class="fas fa-bell"></i>
-                    </div>
+                    <div class="popup-header-icon"><i class="fas fa-bell"></i></div>
                     <div class="popup-header-text">
                         <h2>طلب جديد!</h2>
                         <p>يحتاج تحضير فوري</p>
                     </div>
                 </div>
-                <button class="popup-close" id="closePopupBtn">
-                    <i class="fas fa-times"></i>
-                </button>
+                <button class="popup-close" id="closePopupBtn"><i class="fas fa-times"></i></button>
             </div>
-            
             <div class="popup-body">
                 <div class="order-id-badge">
                     <i class="fas fa-receipt"></i>
                     <span id="popupOrderId">TSN-0001</span>
                 </div>
-                
                 <div class="popup-table-card">
                     <div class="popup-table-number" id="popupTableNumber">5</div>
                     <div class="popup-table-label">رقم الطاولة</div>
                 </div>
-
                 <div class="popup-info-grid">
                     <div class="info-card">
                         <div class="info-icon"><i class="fas fa-clock"></i></div>
@@ -1020,17 +564,15 @@
                         <div class="info-value" id="popupTotal">0 د.أ</div>
                     </div>
                 </div>
-
                 <div class="popup-timer">
                     <div class="timer-header">
                         <span><i class="fas fa-hourglass-half"></i> وقت الاستلام</span>
                         <span class="timer-display" id="timerDisplay">01:00</span>
                     </div>
                     <div class="timer-progress">
-                        <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+                        <div class="progress-fill" id="progressFill" style="width:0%;"></div>
                     </div>
                 </div>
-
                 <button id="receiveOrderBtn" class="receive-btn">
                     <i class="fas fa-check-circle"></i>
                     تم الاستلام
@@ -1039,39 +581,142 @@
         </div>
     </div>
 
+    <!-- بوبأب تعديل الطلب (برتقالي) -->
+    <div id="modifyPopupOverlay" class="popup-overlay modify-popup-overlay">
+        <div class="order-popup modify-popup">
+            <div class="popup-header modify-header">
+                <div class="popup-header-content">
+                    <div class="popup-header-icon modify-icon"><i class="fas fa-pencil-alt"></i></div>
+                    <div class="popup-header-text">
+                        <h2>تعديل على طلب!</h2>
+                        <p>تم تعديل طلب طاولة موجودة</p>
+                    </div>
+                </div>
+                <button class="popup-close" id="closeModifyPopupBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="popup-body">
+                <div class="order-id-badge modify-badge">
+                    <i class="fas fa-pencil-alt"></i>
+                    <span id="modifyPopupOrderId">TSN-0001</span>
+                </div>
+                <div class="popup-table-card modify-table-card">
+                    <div class="popup-table-number" id="modifyPopupTableNumber">5</div>
+                    <div class="popup-table-label">تم تعديل طاولة رقم</div>
+                </div>
+                <div class="popup-info-grid">
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-clock"></i></div>
+                        <div class="info-label">وقت التعديل</div>
+                        <div class="info-value" id="modifyPopupTime">-</div>
+                    </div>
+                    <div class="info-card">
+                        <div class="info-icon"><i class="fas fa-calculator"></i></div>
+                        <div class="info-label">الإجمالي الجديد</div>
+                        <div class="info-value" id="modifyPopupTotal">0 د.أ</div>
+                    </div>
+                </div>
+                <div class="modify-items-preview" id="modifyItemsPreview"></div>
+                <button id="acknowledgeModifyBtn" class="receive-btn modify-receive-btn">
+                    <i class="fas fa-check-circle"></i>
+                    تم الاطلاع
+                </button>
+            </div>
+        </div>
+    </div>
+
     <audio id="notificationSound" preload="auto" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
     </audio>
+    <audio id="modifySound" preload="auto" loop>
+        <source src="https://assets.mixkit.co/active_storage/sfx/1862/1862-preview.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
-        // ======================== الإعدادات المحسنة (تحديث كل 5 ثوان) ========================
         const CONFIG = {
-            API_URL: 'https://script.google.com/macros/s/AKfycbzU7pp0Ul8KNDT4iEd7kGFxNrXYzX4B4zfdYANjE59ABvMq1vIKlmEM4gAOipY47Zeoiw/exec',
+            API_URL: 'https://script.google.com/macros/s/AKfycbykiFX2nytD9D1lvRgCWXC6k-gMwTC-wyLmX_v7CPfQLHnU-VN-or54kjqzJcaa7I2zew/exec',
             RESTAURANT: { name: 'تل السنديان', code: 'TSN' },
-            REFRESH_INTERVAL: 5000,               // 5 ثوانٍ كما طلبت
-            MAX_REFRESH_INTERVAL: 60000,           // دقيقة كحد أقصى عند الفشل
-            CLEANUP_INTERVAL: 24 * 60 * 60 * 1000, // مرة يومياً (24 ساعة)
-            OLD_DAYS_THRESHOLD: 7,                  // حذف المكتملة بعد 7 أيام
+            REFRESH_INTERVAL: 5000,
+            MAX_REFRESH_INTERVAL: 60000,
+            CLEANUP_INTERVAL: 24 * 60 * 60 * 1000,
+            OLD_DAYS_THRESHOLD: 7,
             FETCH_TIMEOUT: 8000,
             MAX_RETRIES: 3,
-            CACHE_KEY: 'tel_alsindian_orders_backup', // احتياطي للـ localStorage
+            CACHE_KEY: 'tel_alsindian_orders_backup',
+            // ======== مفتاح التخزين الدائم للتعديلات ========
+            MODIFIED_ORDERS_KEY: 'tel_alsindian_modified_orders',
         };
 
-        // ======================== IndexedDB Wrapper ========================
-        const DB = {
-            name: 'TelAlSindianDB',
-            version: 1,
-            store: 'orders',
-            db: null,
+        const TABLE_STATUS_KEY = 'tel_sindian_table_status';
 
+        function loadTableStatuses() {
+            try { return JSON.parse(localStorage.getItem(TABLE_STATUS_KEY) || '{}'); }
+            catch(e) { return {}; }
+        }
+
+        function saveTableStatuses(statuses) {
+            try {
+                localStorage.setItem(TABLE_STATUS_KEY, JSON.stringify(statuses));
+                if (window.BroadcastChannel) {
+                    const bc = new BroadcastChannel('table_status_channel');
+                    bc.postMessage({ type: 'TABLE_STATUS_UPDATE', statuses });
+                    bc.close();
+                }
+            } catch(e) {}
+        }
+
+        function setTableStatus(tableNum, status) {
+            const statuses = loadTableStatuses();
+            statuses[tableNum] = status;
+            saveTableStatuses(statuses);
+        }
+
+        // ======================== حفظ/تحميل التعديلات من localStorage ========================
+        /**
+         * هيكل البيانات المحفوظة:
+         * {
+         *   "TSN-0001": {
+         *     diff: { added: [...], removed: [...], changed: [...] },
+         *     modifiedAt: "...",
+         *     newItems: [...],   // الأصناف الجديدة الكاملة بعد التعديل
+         *     newTotal: "...",
+         *     newNotes: "..."
+         *   }, ...
+         * }
+         */
+        function loadModifiedOrdersFromStorage() {
+            try {
+                return JSON.parse(localStorage.getItem(CONFIG.MODIFIED_ORDERS_KEY) || '{}');
+            } catch(e) { return {}; }
+        }
+
+        function saveModifiedOrdersToStorage(modifiedOrders) {
+            try {
+                localStorage.setItem(CONFIG.MODIFIED_ORDERS_KEY, JSON.stringify(modifiedOrders));
+            } catch(e) {}
+        }
+
+        function addModifiedOrder(orderId, modData) {
+            const all = loadModifiedOrdersFromStorage();
+            all[orderId] = modData;
+            saveModifiedOrdersToStorage(all);
+            KitchenState.modifiedOrders[orderId] = modData;
+        }
+
+        function removeModifiedOrder(orderId) {
+            const all = loadModifiedOrdersFromStorage();
+            delete all[orderId];
+            saveModifiedOrdersToStorage(all);
+            delete KitchenState.modifiedOrders[orderId];
+        }
+
+        // ======================== IndexedDB ========================
+        const DB = {
+            name: 'TelAlSindianDB', version: 1, store: 'orders', db: null,
             async init() {
                 return new Promise((resolve, reject) => {
                     const request = indexedDB.open(this.name, this.version);
                     request.onerror = () => reject(request.error);
-                    request.onsuccess = () => {
-                        this.db = request.result;
-                        resolve();
-                    };
+                    request.onsuccess = () => { this.db = request.result; resolve(); };
                     request.onupgradeneeded = (event) => {
                         const db = event.target.result;
                         if (!db.objectStoreNames.contains(this.store)) {
@@ -1083,7 +728,6 @@
                     };
                 });
             },
-
             async getAllOrders() {
                 return new Promise((resolve, reject) => {
                     const tx = this.db.transaction(this.store, 'readonly');
@@ -1093,23 +737,18 @@
                     request.onerror = () => reject(request.error);
                 });
             },
-
             async putOrders(orders) {
                 const tx = this.db.transaction(this.store, 'readwrite');
                 const store = tx.objectStore(this.store);
-                for (const order of orders) {
-                    store.put(order);
-                }
-                return tx.complete;
+                for (const order of orders) store.put(order);
+                return new Promise((resolve) => { tx.oncomplete = resolve; tx.onerror = resolve; });
             },
-
             async deleteOrder(orderId) {
                 const tx = this.db.transaction(this.store, 'readwrite');
                 const store = tx.objectStore(this.store);
                 store.delete(orderId);
-                return tx.complete;
+                return new Promise((resolve) => { tx.oncomplete = resolve; tx.onerror = resolve; });
             },
-
             async clearOldOrders(days = 7) {
                 const cutoff = new Date();
                 cutoff.setDate(cutoff.getDate() - days);
@@ -1121,33 +760,25 @@
                 request.onsuccess = (event) => {
                     const cursor = event.target.result;
                     if (cursor) {
-                        if (cursor.value.status === 'completed') {
-                            cursor.delete();
-                        }
+                        if (cursor.value.status === 'completed') cursor.delete();
                         cursor.continue();
                     }
                 };
-                return tx.complete;
+                return new Promise((resolve) => { tx.oncomplete = resolve; tx.onerror = resolve; });
             }
         };
 
         // ======================== حالة التطبيق ========================
         const KitchenState = {
-            active: false,
-            soundEnabled: true,
-            currentStatus: 'preparing',
-            orders: [],
-            lastOrderIds: new Set(),
-            popupActive: false,
-            currentAlertOrder: null,
-            timerInterval: null,
-            refreshInterval: null,
-            initialLoad: true,
-            isLoading: false,
-            retryCount: 0,
-            online: navigator.onLine,
-            orderElements: new Map(),
-            currentRefreshInterval: CONFIG.REFRESH_INTERVAL
+            active: false, soundEnabled: true, currentStatus: 'preparing',
+            orders: [], lastOrderIds: new Set(), popupActive: false,
+            modifyPopupActive: false,
+            currentAlertOrder: null, timerInterval: null, refreshInterval: null,
+            initialLoad: true, isLoading: false, retryCount: 0,
+            online: navigator.onLine, orderElements: new Map(),
+            currentRefreshInterval: CONFIG.REFRESH_INTERVAL,
+            // ======== يُحمَّل من localStorage عند البدء ========
+            modifiedOrders: {}
         };
 
         const DOM = {
@@ -1163,6 +794,7 @@
             refreshBtn: document.getElementById('refreshBtn'),
             tabs: document.querySelectorAll('.kitchen-tab'),
             notificationSound: document.getElementById('notificationSound'),
+            modifySound: document.getElementById('modifySound'),
             popupOverlay: document.getElementById('popupOverlay'),
             closePopupBtn: document.getElementById('closePopupBtn'),
             receiveBtn: document.getElementById('receiveOrderBtn'),
@@ -1171,7 +803,15 @@
             popupTime: document.getElementById('popupTime'),
             popupTotal: document.getElementById('popupTotal'),
             timerDisplay: document.getElementById('timerDisplay'),
-            progressFill: document.getElementById('progressFill')
+            progressFill: document.getElementById('progressFill'),
+            modifyPopupOverlay: document.getElementById('modifyPopupOverlay'),
+            closeModifyPopupBtn: document.getElementById('closeModifyPopupBtn'),
+            acknowledgeModifyBtn: document.getElementById('acknowledgeModifyBtn'),
+            modifyPopupOrderId: document.getElementById('modifyPopupOrderId'),
+            modifyPopupTableNumber: document.getElementById('modifyPopupTableNumber'),
+            modifyPopupTime: document.getElementById('modifyPopupTime'),
+            modifyPopupTotal: document.getElementById('modifyPopupTotal'),
+            modifyItemsPreview: document.getElementById('modifyItemsPreview'),
         };
 
         // ======================== دوال مساعدة ========================
@@ -1188,10 +828,8 @@
             if (Array.isArray(order.items) && order.items.length > 0) {
                 return order.items.reduce((sum, item) => {
                     let price = 0, quantity = 0;
-                    if (typeof item === 'number') {
-                        price = item;
-                        quantity = 1;
-                    } else if (typeof item === 'object' && item !== null) {
+                    if (typeof item === 'number') { price = item; quantity = 1; }
+                    else if (typeof item === 'object' && item !== null) {
                         price = extractNumber(item.price || item.Price || item.unitPrice || item.cost || 0);
                         quantity = extractNumber(item.quantity || item.Quantity || item.qty || 1);
                     }
@@ -1210,13 +848,13 @@
                 total: order.total || order.orderTotal || '0',
                 itemsCount: order.itemsCount || order.itemCount || (order.items ? order.items.length : 0),
                 items: Array.isArray(order.items) ? order.items.map(item => {
-                    if (typeof item === 'string') {
-                        return { name: item, quantity: 1, price: 0 };
-                    } else if (typeof item === 'object' && item !== null) {
-                        const name = item.name || item.Name || item.title || item.product || 'صنف';
-                        const quantity = extractNumber(item.quantity || item.Quantity || item.qty || 1);
-                        const price = extractNumber(item.price || item.Price || item.unitPrice || item.cost || 0);
-                        return { name, quantity, price };
+                    if (typeof item === 'string') return { name: item, quantity: 1, price: 0 };
+                    else if (typeof item === 'object' && item !== null) {
+                        return {
+                            name: item.name || item.Name || item.title || item.product || 'صنف',
+                            quantity: extractNumber(item.quantity || item.Quantity || item.qty || 1),
+                            price: extractNumber(item.price || item.Price || item.unitPrice || item.cost || 0)
+                        };
                     }
                     return { name: 'صنف', quantity: 1, price: 0 };
                 }) : [],
@@ -1227,33 +865,139 @@
             };
         }
 
-        // ======================== معالجة الطلبات والعرض ========================
+        // ======================== حساب الفروقات ========================
+        function computeDiff(oldItems, newItems) {
+            const result = { added: [], removed: [], changed: [] };
+            if (!oldItems || oldItems.length === 0) {
+                result.added = newItems.map(i => ({ ...i }));
+                return result;
+            }
+            const oldMap = {};
+            oldItems.forEach(item => {
+                const key = (item.name || '').trim().toLowerCase();
+                oldMap[key] = { ...item };
+            });
+            const newMap = {};
+            newItems.forEach(item => {
+                const key = (item.name || '').trim().toLowerCase();
+                newMap[key] = { ...item };
+            });
+            newItems.forEach(item => {
+                const key = (item.name || '').trim().toLowerCase();
+                if (!oldMap[key]) {
+                    result.added.push({ ...item });
+                } else {
+                    const oldQty = extractNumber(oldMap[key].quantity);
+                    const newQty = extractNumber(item.quantity);
+                    if (newQty !== oldQty) {
+                        result.changed.push({ ...item, oldQty, newQty });
+                    }
+                }
+            });
+            oldItems.forEach(item => {
+                const key = (item.name || '').trim().toLowerCase();
+                if (!newMap[key]) {
+                    result.removed.push({ ...item });
+                }
+            });
+            return result;
+        }
+
+        // ======================== بناء HTML قسم التعديلات ========================
+        function buildModificationsHTML(diff) {
+            if (!diff) return '';
+            const totalChanges = diff.added.length + diff.removed.length + diff.changed.length;
+            if (totalChanges === 0) return '';
+
+            let itemsHTML = '';
+            diff.added.forEach(item => {
+                const price = extractNumber(item.price);
+                const qty = extractNumber(item.quantity);
+                itemsHTML += `
+                    <div class="mod-item">
+                        <div class="mod-item-icon"><i class="fas fa-plus"></i></div>
+                        <span class="mod-item-name">${item.name || 'صنف'}</span>
+                        <span class="mod-item-qty">×${qty}</span>
+                        <span class="mod-item-price">${(price * qty).toFixed(2)} د.أ</span>
+                    </div>`;
+            });
+            diff.changed.forEach(item => {
+                itemsHTML += `
+                    <div class="mod-qty-change">
+                        <div class="mod-qty-icon"><i class="fas fa-arrows-alt-v"></i></div>
+                        <span class="mod-qty-name">${item.name || 'صنف'}</span>
+                        <span class="mod-qty-old">×${item.oldQty}</span>
+                        <span class="mod-qty-arrow">←</span>
+                        <span class="mod-qty-new">×${item.newQty}</span>
+                    </div>`;
+            });
+            diff.removed.forEach(item => {
+                itemsHTML += `
+                    <div class="mod-removed">
+                        <div class="mod-removed-icon"><i class="fas fa-minus"></i></div>
+                        <span class="mod-removed-name">${item.name || 'صنف'}</span>
+                        <span class="mod-removed-label">محذوف</span>
+                    </div>`;
+            });
+
+            return `
+                <div class="new-modifications-section">
+                    <div class="new-modifications-header">
+                        <div class="new-modifications-header-icon"><i class="fas fa-pencil-alt"></i></div>
+                        <span class="new-modifications-title">✨ التعديلات الجديدة</span>
+                        <span class="new-modifications-count">${totalChanges} تغيير</span>
+                    </div>
+                    <div class="new-modifications-body">${itemsHTML}</div>
+                </div>`;
+        }
+
+        // ======================== معالجة الطلبات ========================
         async function processOrders(orders, options = {}) {
-            const oldOrders = KitchenState.orders;
-            const oldIds = new Set(oldOrders.map(o => o.orderId));
-            
-            const newOrders = orders.map(normalizeOrder);
-            
+            const oldIds = new Set(KitchenState.orders.map(o => o.orderId));
+
+            // بناء خريطة للطلبات الموجودة في الذاكرة (تحمل الأصناف الصحيحة المُعدَّلة)
+            const existingOrdersMap = {};
+            KitchenState.orders.forEach(o => { existingOrdersMap[o.orderId] = o; });
+
+            const newOrders = orders.map(o => {
+                const normalized = normalizeOrder(o);
+
+                // ======== حماية الطلبات المكتملة التي تم تعديلها ========
+                // إذا كان الطلب موجوداً في الذاكرة بحالة "مكتمل" نحافظ على أصنافه المحدَّثة
+                const existingOrder = existingOrdersMap[normalized.orderId];
+                if (existingOrder && existingOrder.status === 'completed' && existingOrder.items && existingOrder.items.length > 0) {
+                    normalized.items = existingOrder.items;
+                    normalized.total = existingOrder.total;
+                    normalized.notes = existingOrder.notes;
+                    normalized.completedAt = existingOrder.completedAt || normalized.completedAt;
+                    normalized.status = 'completed';
+                    return normalized;
+                }
+
+                // ======== تطبيق البيانات المعدَّلة المحفوظة على الطلبات قيد التحضير ========
+                const modData = KitchenState.modifiedOrders[normalized.orderId];
+                if (modData && normalized.status === 'preparing') {
+                    if (modData.newItems && modData.newItems.length > 0) {
+                        normalized.items = modData.newItems.map(i => ({ ...i }));
+                    }
+                    if (modData.newTotal) normalized.total = String(modData.newTotal);
+                    if (modData.newNotes !== undefined) normalized.notes = modData.newNotes;
+                }
+                return normalized;
+            });
             KitchenState.orders = newOrders;
             syncOrderCards(newOrders);
             updateStats();
-            
+
             if (!options.initialLoad) {
                 const newOnes = newOrders.filter(o => !oldIds.has(o.orderId) && o.status === 'preparing');
-                if (newOnes.length > 0) {
-                    showNewOrderPopup(newOnes[newOnes.length - 1]);
-                }
+                if (newOnes.length > 0) showNewOrderPopup(newOnes[newOnes.length - 1]);
             } else {
                 KitchenState.initialLoad = false;
             }
-            
-            // حفظ في IndexedDB
-            try {
-                await DB.putOrders(newOrders);
-            } catch (e) {
-                console.warn('فشل حفظ في IndexedDB، استخدام localStorage', e);
-                saveToLocalStorage(newOrders);
-            }
+
+            try { await DB.putOrders(newOrders); }
+            catch(e) { saveToLocalStorage(newOrders); }
         }
 
         function syncOrderCards(orders) {
@@ -1262,23 +1006,24 @@
 
             for (let id of currentIds) {
                 if (!newIds.has(id)) {
-                    const element = KitchenState.orderElements.get(id);
-                    if (element && element.parentNode) {
-                        element.remove();
-                    }
+                    const el = KitchenState.orderElements.get(id);
+                    if (el && el.parentNode) el.remove();
                     KitchenState.orderElements.delete(id);
                 }
             }
 
             orders.forEach(order => {
-                const existingElement = KitchenState.orderElements.get(order.orderId);
-                if (existingElement) {
-                    updateCardContent(existingElement, order);
-                    existingElement.dataset.status = order.status;
-                    existingElement.dataset.timestamp = order.timestamp;
-                    if (order.completedAt) existingElement.dataset.completedAt = order.completedAt;
+                const isModified = !!KitchenState.modifiedOrders[order.orderId] && order.status === 'preparing';
+                const existing = KitchenState.orderElements.get(order.orderId);
+                if (existing) {
+                    if (isModified) existing.classList.add('modified');
+                    else existing.classList.remove('modified');
+                    updateCardContent(existing, order);
+                    existing.dataset.status = order.status;
+                    existing.dataset.timestamp = order.timestamp;
+                    if (order.completedAt) existing.dataset.completedAt = order.completedAt;
                 } else {
-                    const newCard = createOrderCard(order);
+                    const newCard = createOrderCard(order, isModified);
                     KitchenState.orderElements.set(order.orderId, newCard);
                     DOM.ordersContainer.appendChild(newCard);
                 }
@@ -1286,15 +1031,12 @@
 
             sortCardsByTime();
             filterCardsByStatus(KitchenState.currentStatus);
-
-            if (KitchenState.orderElements.size === 0) {
-                showEmptyState();
-            }
+            if (KitchenState.orderElements.size === 0) showEmptyState();
         }
 
-        function createOrderCard(order) {
+        function createOrderCard(order, isModified) {
             const card = document.createElement('div');
-            card.className = 'order-card';
+            card.className = 'order-card' + (isModified ? ' modified' : '');
             card.dataset.orderId = order.orderId;
             card.dataset.timestamp = order.timestamp;
             if (order.completedAt) card.dataset.completedAt = order.completedAt;
@@ -1303,26 +1045,44 @@
             return card;
         }
 
+        // ======================== fillCardContent ========================
         function fillCardContent(card, order) {
+            const isModified = card.classList.contains('modified');
             const items = order.items || [];
             const tableNumber = order.tableNumber || '?';
             let timeStr = '-';
-            
             if (order.timestamp) {
-                try {
-                    const time = new Date(order.timestamp);
-                    timeStr = time.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-                } catch (e) {
-                    timeStr = '-';
-                }
+                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); }
+                catch(e) { timeStr = '-'; }
             }
-            
             const displayTotal = calculateOrderTotal(order).toFixed(2);
-            
+
+            const modifiedBadgeHTML = isModified
+                ? `<span class="modified-badge"><i class="fas fa-pencil-alt"></i> معدَّل</span>` : '';
+
+            let statusBadgeHTML = '';
+            if (isModified && order.status === 'preparing') {
+                statusBadgeHTML = `<span class="status-badge status-modified"><i class="fas fa-pencil-alt"></i> معدَّل - قيد التحضير</span>`;
+            } else if (order.status === 'preparing') {
+                statusBadgeHTML = `<span class="status-badge status-preparing"><i class="fas fa-fire"></i> قيد التحضير</span>`;
+            } else {
+                statusBadgeHTML = `<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> مكتمل</span>`;
+            }
+
+            // ===== قسم التعديلات =====
+            let modificationsHTML = '';
+            if (isModified && KitchenState.modifiedOrders[order.orderId]) {
+                const diff = KitchenState.modifiedOrders[order.orderId].diff;
+                if (diff) modificationsHTML = buildModificationsHTML(diff);
+            }
+
             card.innerHTML = `
                 <div class="order-header">
                     <span class="order-id">${order.orderId || 'UNKNOWN'}</span>
-                    <span class="order-time">${timeStr}</span>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        ${modifiedBadgeHTML}
+                        <span class="order-time">${timeStr}</span>
+                    </div>
                 </div>
                 <div class="order-body">
                     <div class="table-info">
@@ -1331,12 +1091,11 @@
                             ${tableNumber}
                         </div>
                     </div>
-                    
                     <div class="order-items">
                         ${items.map(item => {
                             const price = extractNumber(item.price);
-                            const quantity = extractNumber(item.quantity);
-                            const itemTotal = (price * quantity).toFixed(2);
+                            const qty = extractNumber(item.quantity);
+                            const itemTotal = (price * qty).toFixed(2);
                             return `
                                 <div class="order-item">
                                     <div class="item-details">
@@ -1344,178 +1103,120 @@
                                         <div class="item-price-info">
                                             <span class="item-unit-price">${price.toFixed(2)} د.أ</span>
                                             <span class="item-separator">|</span>
-                                            <span class="item-quantity">x${quantity}</span>
+                                            <span class="item-quantity">x${qty}</span>
                                         </div>
                                     </div>
                                     <span class="item-total">${itemTotal} د.أ</span>
-                                </div>
-                            `;
+                                </div>`;
                         }).join('')}
-                        
                         <div class="order-total">
                             <span>المجموع</span>
                             <span>${displayTotal} د.أ</span>
                         </div>
                     </div>
-                    
-                    ${order.notes ? `
-                        <div class="order-notes">
-                            <i class="fas fa-sticky-note"></i>
-                            ${order.notes}
-                        </div>
-                    ` : ''}
-                    
-                    <span class="status-badge ${order.status === 'preparing' ? 'status-preparing' : 'status-completed'}">
-                        <i class="fas ${order.status === 'preparing' ? 'fa-fire' : 'fa-check-circle'}"></i>
-                        ${order.status === 'preparing' ? 'قيد التحضير' : 'مكتمل'}
-                    </span>
+                    ${order.notes ? `<div class="order-notes"><i class="fas fa-sticky-note"></i> ${order.notes}</div>` : ''}
+                    ${modificationsHTML}
+                    ${statusBadgeHTML}
                 </div>
-                
                 <div class="order-footer">
                     ${order.status === 'preparing' ? `
-                        <button class="action-btn btn-done" onclick="window.completeOrder('${order.orderId}')">
+                        <button class="action-btn btn-done" data-action="complete" data-order-id="${order.orderId}">
                             <i class="fas fa-check"></i> تم التحضير
                         </button>
                     ` : ''}
-                    <button class="action-btn btn-print" onclick="window.printOrder('${order.orderId}')">
+                    <button class="action-btn btn-print" data-action="print" data-order-id="${order.orderId}">
                         <i class="fas fa-print"></i> طباعة
                     </button>
                     ${order.status === 'completed' ? `
-                        <button class="action-btn btn-delete" onclick="window.deleteOrder('${order.orderId}')">
+                        <button class="action-btn btn-free-table" data-action="freeTable" data-order-id="${order.orderId}" data-table="${order.tableNumber}" style="background:linear-gradient(145deg,#2b6cb0,#1a4a8a);border:2px solid rgba(255,255,255,0.3);">
+                            <i class="fas fa-door-open"></i> تحرير الطاولة
+                        </button>
+                        <button class="action-btn btn-delete" data-action="delete" data-order-id="${order.orderId}">
                             <i class="fas fa-trash-alt"></i> حذف
                         </button>
                     ` : ''}
-                </div>
-            `;
+                </div>`;
         }
 
-        function updateCardContent(card, order) {
-            fillCardContent(card, order);
-        }
+        function updateCardContent(card, order) { fillCardContent(card, order); }
 
         function sortCardsByTime() {
             const cards = Array.from(DOM.ordersContainer.querySelectorAll('.order-card'));
             cards.sort((a, b) => {
-                const statusA = a.dataset.status;
-                const statusB = b.dataset.status;
-                
-                let timeA, timeB;
-                timeA = statusA === 'completed' && a.dataset.completedAt ? new Date(a.dataset.completedAt).getTime() : new Date(a.dataset.timestamp).getTime();
-                timeB = statusB === 'completed' && b.dataset.completedAt ? new Date(b.dataset.completedAt).getTime() : new Date(b.dataset.timestamp).getTime();
-                
-                if (isNaN(timeA)) timeA = 0;
-                if (isNaN(timeB)) timeB = 0;
-                
-                return timeB - timeA;
+                const tA = a.dataset.status === 'completed' && a.dataset.completedAt ? new Date(a.dataset.completedAt).getTime() : new Date(a.dataset.timestamp).getTime();
+                const tB = b.dataset.status === 'completed' && b.dataset.completedAt ? new Date(b.dataset.completedAt).getTime() : new Date(b.dataset.timestamp).getTime();
+                return (isNaN(tB) ? 0 : tB) - (isNaN(tA) ? 0 : tA);
             });
-            cards.forEach(card => DOM.ordersContainer.appendChild(card));
+            cards.forEach(c => DOM.ordersContainer.appendChild(c));
         }
 
         function filterCardsByStatus(status) {
             const cards = DOM.ordersContainer.querySelectorAll('.order-card');
-            let visibleCount = 0;
+            let visible = 0;
             cards.forEach(card => {
-                if (card.dataset.status === status) {
-                    card.classList.remove('hidden-by-tab');
-                    visibleCount++;
-                } else {
-                    card.classList.add('hidden-by-tab');
-                }
+                if (card.dataset.status === status) { card.classList.remove('hidden-by-tab'); visible++; }
+                else card.classList.add('hidden-by-tab');
             });
-
-            const emptyState = DOM.ordersContainer.querySelector('.empty-state');
-            if (visibleCount === 0 && KitchenState.orderElements.size > 0) {
-                if (!emptyState) {
-                    const emptyDiv = document.createElement('div');
-                    emptyDiv.className = 'empty-state';
-                    emptyDiv.innerHTML = `
-                        <i class="fas fa-utensils"></i>
-                        <h3>لا توجد طلبات ${status === 'preparing' ? 'قيد التحضير' : 'مكتملة'}</h3>
-                        <p>سيتم عرض الطلبات الجديدة هنا</p>
-                    `;
-                    DOM.ordersContainer.appendChild(emptyDiv);
+            const empty = DOM.ordersContainer.querySelector('.empty-state');
+            if (visible === 0 && KitchenState.orderElements.size > 0) {
+                if (!empty) {
+                    const div = document.createElement('div');
+                    div.className = 'empty-state';
+                    div.innerHTML = `<i class="fas fa-utensils"></i><h3>لا توجد طلبات ${status === 'preparing' ? 'قيد التحضير' : 'مكتملة'}</h3><p>سيتم عرض الطلبات هنا</p>`;
+                    DOM.ordersContainer.appendChild(div);
                 }
-            } else if (emptyState) {
-                emptyState.remove();
-            }
+            } else if (empty) empty.remove();
         }
 
         function showEmptyState() {
-            DOM.ordersContainer.innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-utensils"></i>
-                    <h3>لا توجد طلبات</h3>
-                    <p>سيتم عرض الطلبات الجديدة هنا</p>
-                </div>
-            `;
+            DOM.ordersContainer.innerHTML = `<div class="empty-state"><i class="fas fa-utensils"></i><h3>لا توجد طلبات</h3><p>سيتم عرض الطلبات الجديدة هنا</p></div>`;
         }
 
         function updateStats() {
-            const preparing = KitchenState.orders.filter(o => o.status === 'preparing').length;
-            const completed = KitchenState.orders.filter(o => o.status === 'completed').length;
-            
-            DOM.preparingCount.textContent = preparing;
-            DOM.completedCount.textContent = completed;
-            DOM.preparingBadge.textContent = preparing;
-            DOM.completedBadge.textContent = completed;
+            const prep = KitchenState.orders.filter(o => o.status === 'preparing').length;
+            const comp = KitchenState.orders.filter(o => o.status === 'completed').length;
+            DOM.preparingCount.textContent = prep;
+            DOM.completedCount.textContent = comp;
+            DOM.preparingBadge.textContent = prep;
+            DOM.completedBadge.textContent = comp;
         }
 
-        // ======================== التخزين المحلي الاحتياطي ========================
         function saveToLocalStorage(orders) {
-            try {
-                localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(orders));
-                localStorage.setItem(CONFIG.CACHE_KEY + '_timestamp', Date.now().toString());
-            } catch (error) {
-                console.error('خطأ في الحفظ إلى localStorage:', error);
-            }
+            try { localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(orders)); } catch(e) {}
         }
 
         function loadFromLocalStorage() {
             try {
                 const orders = JSON.parse(localStorage.getItem(CONFIG.CACHE_KEY) || '[]');
-                if (orders.length > 0) {
-                    processOrders(orders, { initialLoad: true });
-                } else {
-                    showEmptyState();
-                }
-            } catch (error) {
-                console.error('خطأ في التحميل من localStorage:', error);
-            }
+                if (orders.length > 0) processOrders(orders, { initialLoad: true });
+                else showEmptyState();
+            } catch(e) { showEmptyState(); }
         }
 
-        // ======================== الاتصال بالخادم (تحسين تدريجي) ========================
         async function loadOrdersWithRetry() {
             if (!KitchenState.active || KitchenState.isLoading) return;
             KitchenState.isLoading = true;
             DOM.refreshBtn.innerHTML = '<i class="fas fa-spinner spinner"></i>';
-            
-            // تحديد آخر طابع زمني موجود
+
             let lastSync = 0;
             if (KitchenState.orders.length > 0) {
                 const timestamps = KitchenState.orders.map(o => new Date(o.timestamp).getTime());
                 lastSync = Math.max(...timestamps);
             }
-            
+
             try {
                 const url = `${CONFIG.API_URL}?action=getOrders&lastSync=${lastSync}&_=${Date.now()}`;
                 await fetchWithTimeout(url, { timeout: CONFIG.FETCH_TIMEOUT });
-                
                 KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL;
                 KitchenState.retryCount = 0;
-            } catch (error) {
+            } catch(error) {
                 KitchenState.retryCount++;
                 if (KitchenState.retryCount <= CONFIG.MAX_RETRIES) {
-                    KitchenState.currentRefreshInterval = Math.min(
-                        CONFIG.REFRESH_INTERVAL * Math.pow(1.5, KitchenState.retryCount),
-                        CONFIG.MAX_REFRESH_INTERVAL
-                    );
+                    KitchenState.currentRefreshInterval = Math.min(CONFIG.REFRESH_INTERVAL * Math.pow(1.5, KitchenState.retryCount), CONFIG.MAX_REFRESH_INTERVAL);
                 } else {
                     KitchenState.currentRefreshInterval = CONFIG.MAX_REFRESH_INTERVAL;
                 }
-                
-                if (KitchenState.retryCount === 1) {
-                    showNotification('⚠️ بطء في الاتصال، يتم عرض الطلبات المحفوظة', 'info');
-                }
+                if (KitchenState.retryCount === 1) showNotification('⚠️ بطء في الاتصال، يتم عرض الطلبات المحفوظة', 'info');
             } finally {
                 KitchenState.isLoading = false;
                 DOM.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
@@ -1525,24 +1226,27 @@
         async function fetchWithTimeout(url, options = {}) {
             const controller = new AbortController();
             const id = setTimeout(() => controller.abort(), options.timeout);
-            
             try {
-                const response = await fetch(url, {
-                    ...options,
-                    signal: controller.signal,
-                    mode: 'cors',
-                    headers: { 'Accept': 'application/json' }
-                });
+                const response = await fetch(url, { ...options, signal: controller.signal, mode: 'cors', headers: { 'Accept': 'application/json' } });
                 clearTimeout(id);
-                if (!response.ok) throw new Error('Network response not ok');
-                
+                if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
                 if (data.success && data.orders) {
-                    await processOrders(data.orders); // استقبال فقط الطلبات الجديدة
-                } else {
-                    throw new Error('Invalid data format');
-                }
-            } catch (error) {
+                    // ======== دمج بيانات API مع الطلبات المحلية المحدَّثة ========
+                    // الطلبات المكتملة في الذاكرة تحمل الأصناف الصحيحة بعد التعديل
+                    // لا نسمح لـ API بالكتابة فوقها بالأصناف القديمة
+                    const localCompletedMap = {};
+                    KitchenState.orders.forEach(o => {
+                        if (o.status === 'completed') localCompletedMap[o.orderId] = o;
+                    });
+                    const mergedOrders = data.orders.map(apiOrder => {
+                        const localCompleted = localCompletedMap[apiOrder.orderId || apiOrder.id];
+                        if (localCompleted) return localCompleted; // الاحتفاظ بالنسخة المحلية الصحيحة
+                        return apiOrder;
+                    });
+                    await processOrders(mergedOrders);
+                } else throw new Error('Invalid data');
+            } catch(error) {
                 clearTimeout(id);
                 throw error;
             }
@@ -1554,42 +1258,23 @@
                 formData.append('action', 'updateOrderStatus');
                 formData.append('orderId', orderId);
                 formData.append('status', status);
-                
-                fetch(CONFIG.API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                }).catch(e => console.log('فشل تحديث الحالة على الخادم'));
-            } catch (error) {
-                console.error('خطأ في تحديث حالة الطلب:', error);
-            }
+                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
+            } catch(e) {}
         }
 
-        // ======================== وظائف النوافذ المنبثقة والصوت ========================
         function showNewOrderPopup(order) {
             if (!KitchenState.active || KitchenState.popupActive) return;
-            
             KitchenState.currentAlertOrder = order;
             KitchenState.popupActive = true;
-            
             DOM.popupOrderId.textContent = order.orderId || 'UNKNOWN';
             DOM.popupTableNumber.textContent = order.tableNumber || '?';
-            
             let timeStr = '-';
             if (order.timestamp) {
-                try {
-                    const time = new Date(order.timestamp);
-                    timeStr = time.toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
-                } catch (e) {
-                    timeStr = '-';
-                }
+                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); }
+                catch(e) {}
             }
             DOM.popupTime.textContent = timeStr;
-            
-            const total = calculateOrderTotal(order).toFixed(2);
-            DOM.popupTotal.textContent = `${total} د.أ`;
-            
+            DOM.popupTotal.textContent = `${calculateOrderTotal(order).toFixed(2)} د.أ`;
             DOM.popupOverlay.classList.add('active');
             playAlertSound();
             startAlertTimer();
@@ -1599,7 +1284,7 @@
             if (KitchenState.soundEnabled && DOM.notificationSound) {
                 DOM.notificationSound.loop = true;
                 DOM.notificationSound.volume = 0.5;
-                DOM.notificationSound.play().catch(e => {});
+                DOM.notificationSound.play().catch(() => {});
             }
         }
 
@@ -1612,291 +1297,353 @@
         }
 
         function startAlertTimer() {
-            const endTime = Date.now() + 60000; // دقيقة واحدة
-            
-            if (KitchenState.timerInterval) {
-                clearInterval(KitchenState.timerInterval);
-            }
-            
+            const endTime = Date.now() + 60000;
+            if (KitchenState.timerInterval) clearInterval(KitchenState.timerInterval);
             KitchenState.timerInterval = setInterval(() => {
                 const remaining = endTime - Date.now();
-                
-                if (remaining <= 0) {
-                    DOM.timerDisplay.textContent = '00:00';
-                    DOM.progressFill.style.width = '100%';
-                    return;
-                }
-                
+                if (remaining <= 0) { DOM.timerDisplay.textContent = '00:00'; DOM.progressFill.style.width = '100%'; return; }
                 const seconds = Math.floor(remaining / 1000);
                 const mins = Math.floor(seconds / 60);
                 const secs = seconds % 60;
-                
                 DOM.timerDisplay.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
-                
-                const progress = ((60000 - remaining) / 60000) * 100;
-                DOM.progressFill.style.width = `${progress}%`;
+                DOM.progressFill.style.width = `${((60000 - remaining) / 60000) * 100}%`;
             }, 100);
         }
 
         function closePopup() {
             stopAlertSound();
-            
-            if (KitchenState.timerInterval) {
-                clearInterval(KitchenState.timerInterval);
-                KitchenState.timerInterval = null;
-            }
-            
+            if (KitchenState.timerInterval) { clearInterval(KitchenState.timerInterval); KitchenState.timerInterval = null; }
             DOM.popupOverlay.classList.remove('active');
             KitchenState.popupActive = false;
             KitchenState.currentAlertOrder = null;
-            
             DOM.timerDisplay.textContent = '01:00';
             DOM.progressFill.style.width = '0%';
         }
 
-        // ======================== دوال الأحداث العامة ========================
+        // ======================== Event Delegation ========================
+        DOM.ordersContainer.addEventListener('click', (e) => {
+            const btn = e.target.closest('.action-btn[data-action]');
+            if (!btn) return;
+            const action = btn.dataset.action;
+            const orderId = btn.dataset.orderId;
+            if (action === 'complete') window.completeOrder(orderId);
+            else if (action === 'print') window.printOrder(orderId);
+            else if (action === 'delete') window.deleteOrder(orderId);
+            else if (action === 'freeTable') window.freeTable(btn.dataset.table, orderId);
+        });
+
         window.completeOrder = async function(orderId) {
             const order = KitchenState.orders.find(o => o.orderId === orderId);
             if (!order) return;
-            
             const now = new Date().toISOString();
+
+            // ======== خطوة 1: تطبيق الأصناف المعدَّلة على الطلب قبل أي شيء آخر ========
+            // هذا يضمن أن الطلب يحمل الأصناف الصحيحة (المُعدَّلة) عند نقله للمكتملة
+            const modData = KitchenState.modifiedOrders[orderId];
+            if (modData) {
+                if (modData.newItems && modData.newItems.length > 0) {
+                    order.items = modData.newItems.map(i => ({ ...i }));
+                }
+                if (modData.newTotal) order.total = String(modData.newTotal);
+                if (modData.newNotes !== undefined) order.notes = modData.newNotes;
+            }
+
             order.status = 'completed';
             order.completedAt = now;
-            
+
+            // ======== خطوة 2: الآن نمسح بيانات التعديل (بعد تطبيقها) ========
+            removeModifiedOrder(orderId);
+
             updateStats();
-            
             const card = KitchenState.orderElements.get(orderId);
             if (card) {
+                card.classList.remove('modified');
                 updateCardContent(card, order);
                 card.dataset.status = 'completed';
                 card.dataset.completedAt = now;
                 sortCardsByTime();
                 filterCardsByStatus(KitchenState.currentStatus);
             }
-            
-            // حفظ في IndexedDB
-            try {
-                await DB.putOrders([order]);
-            } catch (e) {
-                console.warn('فشل حفظ التحديث في IndexedDB', e);
-                saveToLocalStorage(KitchenState.orders);
-            }
-            
+            setTableStatus(order.tableNumber, 'free');
+            // ======== خطوة 3: حفظ الطلب بأصنافه المحدَّثة في DB ========
+            try { await DB.putOrders([order]); } catch(e) { saveToLocalStorage(KitchenState.orders); }
             updateOrderStatus(orderId, 'completed');
-            showNotification('✅ تم إكمال الطلب', 'success');
+            showNotification('✅ تم إكمال الطلب - الطاولة أصبحت حرة', 'success');
         };
 
         window.deleteOrder = async function(orderId) {
             if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
-            
             KitchenState.orders = KitchenState.orders.filter(o => o.orderId !== orderId);
             KitchenState.lastOrderIds.delete(orderId);
-            
+            // ======== مسح بيانات التعديل عند الحذف ========
+            removeModifiedOrder(orderId);
             const card = KitchenState.orderElements.get(orderId);
-            if (card) {
-                card.remove();
-                KitchenState.orderElements.delete(orderId);
-            }
-            
+            if (card) { card.remove(); KitchenState.orderElements.delete(orderId); }
             updateStats();
             filterCardsByStatus(KitchenState.currentStatus);
-            
-            if (KitchenState.orderElements.size === 0) {
-                showEmptyState();
-            }
-            
-            // حذف من IndexedDB
-            try {
-                await DB.deleteOrder(orderId);
-            } catch (e) {
-                console.warn('فشل حذف من IndexedDB', e);
-            }
-            
-            // إرسال الحذف إلى الخادم
+            if (KitchenState.orderElements.size === 0) showEmptyState();
+            try { await DB.deleteOrder(orderId); } catch(e) {}
             try {
                 const formData = new URLSearchParams();
                 formData.append('action', 'deleteOrder');
                 formData.append('orderId', orderId);
-                fetch(CONFIG.API_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: formData
-                }).catch(e => console.log('فشل حذف الطلب من الخادم'));
+                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
                 showNotification('🗑️ تم حذف الطلب', 'success');
-            } catch (error) {
-                showNotification('⚠️ تم الحذف محلياً، لكن فشل الاتصال بالخادم', 'error');
-            }
+            } catch(error) { showNotification('⚠️ تم الحذف محلياً', 'error'); }
         };
 
         window.printOrder = function(orderId) {
             const order = KitchenState.orders.find(o => o.orderId === orderId);
             if (!order) return;
-            
             const items = order.items || [];
             const tableNumber = order.tableNumber || '?';
             const total = calculateOrderTotal(order).toFixed(2);
             let timeStr = '-';
-            
             if (order.timestamp) {
-                try {
-                    const time = new Date(order.timestamp);
-                    timeStr = time.toLocaleString('ar-EG');
-                } catch (e) {
-                    timeStr = '-';
-                }
+                try { timeStr = new Date(order.timestamp).toLocaleString('ar-EG'); } catch(e) {}
             }
-            
+            // ======== الطباعة تُحوّل الطاولة إلى "billed" فقط إذا كان الطلب لا يزال قيد التحضير ========
+            // الطلبات المكتملة: الطاولة تبقى free (لأنها حُرِّرت عند الإكمال)
+            if (order.status === 'preparing') {
+                setTableStatus(tableNumber, 'billed');
+            }
+            showNotification(`🖨️ طباعة فاتورة الطاولة ${tableNumber}`, 'info');
             const printWindow = window.open('', '_blank');
             printWindow.document.write(`
-                <!DOCTYPE html>
-                <html dir="rtl">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>فاتورة ${order.orderId}</title>
-                    <style>
-                        body { font-family: 'Cairo', sans-serif; padding: 20px; }
-                        .invoice { max-width: 400px; margin: 0 auto; border: 2px solid #2D5A27; padding: 20px; border-radius: 20px; }
-                        .header { text-align: center; margin-bottom: 20px; }
-                        .header i { font-size: 3em; color: #2D5A27; }
-                        h1 { color: #2D5A27; }
-                        .info { background: #F5E6D3; padding: 10px; border-radius: 10px; margin: 10px 0; }
-                        .table-number { font-size: 2em; font-weight: 900; color: #2D5A27; text-align: center; }
-                        table { width: 100%; border-collapse: collapse; margin: 15px 0; }
-                        th { background: #2D5A27; color: white; padding: 8px; }
-                        td { padding: 8px; border-bottom: 1px solid #ddd; }
-                        .total { font-size: 1.5em; font-weight: 900; color: #2D5A27; text-align: left; margin-top: 15px; }
-                        .footer { text-align: center; margin-top: 20px; color: #666; }
-                        .price-info { font-size: 0.8rem; color: #666; }
-                    </style>
-                </head>
-                <body>
-                    <div class="invoice">
-                        <div class="header">
-                            <i class="fas fa-tree"></i>
-                            <h1>تل السنديان</h1>
-                            <p>Tel AlSindian</p>
-                        </div>
-                        
-                        <div class="table-number">
-                            <i class="fas fa-chair"></i> طاولة رقم: ${tableNumber}
-                        </div>
-                        
-                        <div class="info">
-                            <p><strong>رقم الطلب:</strong> ${order.orderId}</p>
-                            <p><strong>الوقت:</strong> ${timeStr}</p>
-                        </div>
-                        
-                        <table>
-                            <tr>
-                                <th>الصنف</th>
-                                <th>سعر الوحدة</th>
-                                <th>الكمية</th>
-                                <th>الإجمالي</th>
-                            </tr>
-                            ${items.map(item => {
-                                const price = extractNumber(item.price);
-                                const qty = extractNumber(item.quantity);
-                                const itemTotal = (price * qty).toFixed(2);
-                                return `
-                                    <tr>
-                                        <td>${item.name || 'صنف'}</td>
-                                        <td>${price.toFixed(2)} د.أ</td>
-                                        <td>${qty}</td>
-                                        <td>${itemTotal} د.أ</td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </table>
-                        
-                        <div class="total">
-                            المجموع: ${total} د.أ
-                        </div>
-                        
-                        <div class="footer">
-                            <p>شكراً لثقتكم 🌲</p>
-                            <p>نتمنى لكم وجبة شهية</p>
-                        </div>
-                    </div>
-                </body>
-                </html>
-            `);
+                <!DOCTYPE html><html dir="rtl">
+                <head><meta charset="UTF-8"><title>فاتورة ${order.orderId}</title>
+                <style>body{font-family:'Cairo',sans-serif;padding:20px}.invoice{max-width:400px;margin:0 auto;border:2px solid #2D5A27;padding:20px;border-radius:20px}.header{text-align:center;margin-bottom:20px}h1{color:#2D5A27}.info{background:#F5E6D3;padding:10px;border-radius:10px;margin:10px 0}.table-number{font-size:2em;font-weight:900;color:#2D5A27;text-align:center}table{width:100%;border-collapse:collapse;margin:15px 0}th{background:#2D5A27;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}.total{font-size:1.5em;font-weight:900;color:#2D5A27;text-align:left;margin-top:15px}.footer{text-align:center;margin-top:20px;color:#666}</style>
+                </head><body>
+                <div class="invoice">
+                    <div class="header"><h1>🌲 تل السنديان</h1><p>Tel AlSindian</p></div>
+                    <div class="table-number">🪑 طاولة رقم: ${tableNumber}</div>
+                    <div class="info"><p><strong>رقم الطلب:</strong> ${order.orderId}</p><p><strong>الوقت:</strong> ${timeStr}</p></div>
+                    <table><tr><th>الصنف</th><th>سعر الوحدة</th><th>الكمية</th><th>الإجمالي</th></tr>
+                    ${items.map(item => {const p=extractNumber(item.price);const q=extractNumber(item.quantity);return`<tr><td>${item.name||'صنف'}</td><td>${p.toFixed(2)} د.أ</td><td>${q}</td><td>${(p*q).toFixed(2)} د.أ</td></tr>`;}).join('')}
+                    </table>
+                    <div class="total">المجموع: ${total} د.أ</div>
+                    ${order.notes?`<div class="info"><strong>ملاحظات:</strong> ${order.notes}</div>`:''}
+                    <div class="footer"><p>شكراً لثقتكم 🌲</p><p>نتمنى لكم وجبة شهية</p></div>
+                </div></body></html>`);
             printWindow.document.close();
             setTimeout(() => printWindow.print(), 500);
         };
 
-        // ======================== التهيئة وبدء التشغيل ========================
+        // ======== تحرير الطاولة يدوياً من بطاقة المكتملة ========
+        window.freeTable = function(tableNumber, orderId) {
+            if (!tableNumber) return;
+            const currentStatus = loadTableStatuses()[tableNumber] || 'free';
+            if (currentStatus === 'free') {
+                showNotification(`🪑 الطاولة ${tableNumber} متاحة بالفعل`, 'info');
+                return;
+            }
+            setTableStatus(tableNumber, 'free');
+            showNotification(`✅ تم تحرير الطاولة ${tableNumber}`, 'success');
+            // تحديث مظهر الزر ليعكس الحالة الجديدة
+            const card = KitchenState.orderElements.get(orderId);
+            if (card) {
+                const freeBtn = card.querySelector('[data-action="freeTable"]');
+                if (freeBtn) {
+                    freeBtn.innerHTML = '<i class="fas fa-check-circle"></i> الطاولة حرة';
+                    freeBtn.disabled = true;
+                    freeBtn.style.opacity = '0.5';
+                    freeBtn.style.cursor = 'default';
+                }
+            }
+        };
+
         async function initializeApp() {
+            // ======== تحميل التعديلات المحفوظة أولاً ========
+            KitchenState.modifiedOrders = loadModifiedOrdersFromStorage();
+
             try {
                 await DB.init();
                 const orders = await DB.getAllOrders();
                 processOrders(orders, { initialLoad: true });
-            } catch (error) {
-                console.error('فشل تهيئة IndexedDB، استخدام localStorage كاحتياطي', error);
-                loadFromLocalStorage(); // الرجوع للطريقة القديمة
-            }
-            
+            } catch(error) { loadFromLocalStorage(); }
             startAutoRefresh();
             startCleanupTask();
         }
 
         function startAutoRefresh() {
-            if (KitchenState.refreshInterval) {
-                clearInterval(KitchenState.refreshInterval);
-            }
-            
+            if (KitchenState.refreshInterval) clearInterval(KitchenState.refreshInterval);
             KitchenState.refreshInterval = setInterval(() => {
-                if (KitchenState.active && !KitchenState.popupActive) {
-                    loadOrdersWithRetry();
-                }
+                if (KitchenState.active && !KitchenState.popupActive) loadOrdersWithRetry();
             }, KitchenState.currentRefreshInterval);
         }
 
         function startCleanupTask() {
             setInterval(async () => {
-                try {
-                    await DB.clearOldOrders(CONFIG.OLD_DAYS_THRESHOLD);
-                    // تحديث القائمة المحلية بعد الحذف
-                    const orders = await DB.getAllOrders();
-                    processOrders(orders);
-                    console.log('تم تنظيف الطلبات القديمة');
-                } catch (error) {
-                    console.error('فشل تنظيف الطلبات القديمة', error);
-                }
+                try { await DB.clearOldOrders(CONFIG.OLD_DAYS_THRESHOLD); const orders = await DB.getAllOrders(); processOrders(orders); } catch(e) {}
             }, CONFIG.CLEANUP_INTERVAL);
         }
 
         function playTestSound() {
             if (DOM.notificationSound && KitchenState.soundEnabled) {
                 DOM.notificationSound.volume = 0.3;
-                DOM.notificationSound.play()
-                    .then(() => {
-                        DOM.notificationSound.pause();
-                        DOM.notificationSound.currentTime = 0;
-                    })
-                    .catch(e => console.log('تحتاج النقر أولاً لتشغيل الصوت'));
+                DOM.notificationSound.play().then(() => { DOM.notificationSound.pause(); DOM.notificationSound.currentTime = 0; }).catch(() => {});
             }
         }
 
-        function handleOnline() {
-            KitchenState.online = true;
-            showNotification('📶 تم استعادة الاتصال بالإنترنت', 'success');
-            KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL;
-            loadOrdersWithRetry();
-        }
-
-        function handleOffline() {
-            KitchenState.online = false;
-            showNotification('⚠️ انقطع الاتصال بالإنترنت، يتم عرض الطلبات المخزنة', 'error');
-        }
+        function handleOnline() { KitchenState.online = true; showNotification('📶 تم استعادة الاتصال', 'success'); KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL; loadOrdersWithRetry(); }
+        function handleOffline() { KitchenState.online = false; showNotification('⚠️ انقطع الاتصال، يتم عرض الطلبات المخزنة', 'error'); }
 
         function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.style.background = type === 'success' ? '#2D5A27' : type === 'error' ? '#8B5A2B' : '#4A7B3D';
-            notification.innerHTML = `<i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'error' ? 'fa-exclamation-circle' : 'fa-info-circle'}"></i> ${message}`;
-            document.body.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
+            const colors = { success: '#2D5A27', error: '#8B5A2B', modify: '#b85400', info: '#4A7B3D' };
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', modify: 'fa-pencil-alt', info: 'fa-info-circle' };
+            const n = document.createElement('div');
+            n.className = 'notification';
+            n.style.background = colors[type] || colors.info;
+            if (type === 'modify') { n.style.border = '2px solid rgba(255,200,80,0.7)'; n.style.boxShadow = '0 8px 25px rgba(255,140,0,0.45)'; }
+            n.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3500);
+        }
+
+        // ======================== بوبأب التعديل ========================
+        function showModifyOrderPopup(data) {
+            if (!KitchenState.active || KitchenState.modifyPopupActive) return;
+            KitchenState.modifyPopupActive = true;
+
+            DOM.modifyPopupOrderId.textContent    = data.orderId || `طاولة ${data.tableNumber}`;
+            DOM.modifyPopupTableNumber.textContent = data.tableNumber || '?';
+            DOM.modifyPopupTotal.textContent      = `${parseFloat(data.total || 0).toFixed(2)} د.أ`;
+            const timeStr = new Date(data.modifiedAt || Date.now()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
+            DOM.modifyPopupTime.textContent = timeStr;
+
+            const newItems = Array.isArray(data.items) ? data.items : [];
+            let previewHTML = `<div class="preview-title"><i class="fas fa-list"></i> تفاصيل الطلب المحدّث</div>`;
+            if (newItems.length === 0) {
+                previewHTML += `<div class="preview-item"><span class="p-name" style="color:#999">لا توجد أصناف</span></div>`;
+            } else {
+                newItems.forEach(item => {
+                    const price = parseFloat(item.price || 0);
+                    const qty   = parseInt(item.quantity || 1);
+                    previewHTML += `<div class="preview-item"><span class="p-name">${item.name || 'صنف'}</span><span class="p-qty">×${qty}</span><span class="p-price">${(price * qty).toFixed(2)} د.أ</span></div>`;
+                });
+            }
+            if (data.notes) previewHTML += `<div class="modify-notes-preview"><i class="fas fa-sticky-note"></i> ${data.notes}</div>`;
+            DOM.modifyItemsPreview.innerHTML = previewHTML;
+
+            // البحث عن الطلب المستهدف
+            let targetOrder = null;
+            if (data.orderId && data.orderId !== 'null' && data.orderId !== '') {
+                targetOrder = KitchenState.orders.find(o => o.orderId === data.orderId);
+            }
+            if (!targetOrder && data.tableNumber) {
+                const tNum = String(data.tableNumber).trim();
+                const tableOrders = KitchenState.orders.filter(o => String(o.tableNumber).trim() === tNum && o.status === 'preparing');
+                if (tableOrders.length > 0) {
+                    tableOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    targetOrder = tableOrders[0];
+                }
+            }
+
+            if (targetOrder) {
+                // ===== حساب الفروقات =====
+                const oldItems = targetOrder.items ? targetOrder.items.map(i => ({ ...i })) : [];
+                const diff = computeDiff(oldItems, newItems);
+
+                // تحديث بيانات الطلب في الذاكرة
+                if (newItems.length > 0) targetOrder.items = newItems.map(i => ({ ...i }));
+                if (data.total) targetOrder.total = String(data.total);
+                if (data.notes !== undefined) targetOrder.notes = data.notes;
+
+                // ======== حفظ التعديل في localStorage بشكل دائم ========
+                addModifiedOrder(targetOrder.orderId, {
+                    diff,
+                    modifiedAt: data.modifiedAt,
+                    newItems: newItems.map(i => ({ ...i })),
+                    newTotal: data.total,
+                    newNotes: data.notes
+                });
+
+                DOM.modifyPopupOverlay.dataset.targetOrderId = targetOrder.orderId;
+                DOM.modifyPopupOverlay.dataset.scrollToId   = targetOrder.orderId;
+
+                // تحديث البطاقة فوراً
+                const card = KitchenState.orderElements.get(targetOrder.orderId);
+                if (card) {
+                    card.classList.add('modified');
+                    card.dataset.status = targetOrder.status;
+                    fillCardContent(card, targetOrder);
+                    filterCardsByStatus(KitchenState.currentStatus);
+                }
+
+                // ======== تحديث IndexedDB بالبيانات الجديدة ========
+                DB.putOrders([targetOrder]).catch(() => {
+                    saveToLocalStorage(KitchenState.orders);
+                });
+            } else {
+                DOM.modifyPopupOverlay.dataset.targetOrderId = '';
+                DOM.modifyPopupOverlay.dataset.scrollToId   = '';
+            }
+
+            playModifySound();
+            DOM.modifyPopupOverlay.classList.add('active');
+        }
+
+        function closeModifyPopup() {
+            stopModifySound();
+            DOM.modifyPopupOverlay.classList.remove('active');
+            KitchenState.modifyPopupActive = false;
+
+            const scrollToId = DOM.modifyPopupOverlay.dataset.scrollToId;
+
+            if (KitchenState.currentStatus !== 'preparing') {
+                DOM.tabs.forEach(t => {
+                    t.classList.remove('active');
+                    if (t.dataset.status === 'preparing') t.classList.add('active');
+                });
+                KitchenState.currentStatus = 'preparing';
+            }
+            filterCardsByStatus('preparing');
+
+            if (scrollToId) {
+                setTimeout(() => {
+                    const card = KitchenState.orderElements.get(scrollToId);
+                    if (card) {
+                        card.classList.remove('hidden-by-tab');
+                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                }, 300);
+            }
+
+            DOM.modifyPopupOverlay.dataset.targetOrderId = '';
+            DOM.modifyPopupOverlay.dataset.scrollToId   = '';
+        }
+
+        function playModifySound() {
+            if (!KitchenState.soundEnabled || !DOM.modifySound) return;
+            DOM.modifySound.loop = true; DOM.modifySound.volume = 0.45;
+            DOM.modifySound.play().catch(() => {});
+        }
+
+        function stopModifySound() {
+            if (!DOM.modifySound) return;
+            DOM.modifySound.pause(); DOM.modifySound.currentTime = 0; DOM.modifySound.loop = false;
+        }
+
+        // ======================== BroadcastChannel ========================
+        if (window.BroadcastChannel) {
+            const bc = new BroadcastChannel('table_status_channel');
+            bc.onmessage = (event) => {
+                if (!event.data) return;
+                if (event.data.type === 'TABLE_STATUS_UPDATE') {
+                    console.log('[cash] Table status updated:', event.data.statuses);
+                }
+                if (event.data.type === 'ORDER_MODIFIED') {
+                    if (!KitchenState.active) return;
+                    showNotification(`✏️ تعديل على طاولة ${event.data.tableNumber}`, 'modify');
+                    showModifyOrderPopup(event.data);
+                }
+                // ======== عند إكمال الطلب من جهة أخرى - مسح التعديلات ========
+                if (event.data.type === 'ORDER_COMPLETED') {
+                    const t = event.data.tableNumber;
+                    const oid = event.data.orderId;
+                    if (oid) removeModifiedOrder(oid);
+                }
+            };
         }
 
         // ======================== ربط الأحداث ========================
@@ -1905,85 +1652,53 @@
             KitchenState.initialLoad = true;
             DOM.startup.classList.add('hidden');
             DOM.mainContent.style.opacity = '1';
-            
             playTestSound();
-            
-            await initializeApp(); // تهيئة IndexedDB وجلب الطلبات
-            
+            await initializeApp();
             window.addEventListener('online', handleOnline);
             window.addEventListener('offline', handleOffline);
-            
             showNotification('✅ تم تشغيل نظام الكاش', 'success');
         });
 
         DOM.soundToggle.addEventListener('click', () => {
             KitchenState.soundEnabled = !KitchenState.soundEnabled;
-            DOM.soundToggle.innerHTML = KitchenState.soundEnabled ? 
-                '<i class="fas fa-volume-up"></i>' : 
-                '<i class="fas fa-volume-mute"></i>';
-            
-            if (!KitchenState.soundEnabled) {
-                stopAlertSound();
-            }
+            DOM.soundToggle.innerHTML = KitchenState.soundEnabled ? '<i class="fas fa-volume-up"></i>' : '<i class="fas fa-volume-mute"></i>';
+            if (!KitchenState.soundEnabled) { stopAlertSound(); stopModifySound(); }
         });
 
-        DOM.refreshBtn.addEventListener('click', () => {
-            loadOrdersWithRetry();
-            showNotification('🔄 جاري تحديث الطلبات', 'info');
-        });
+        DOM.refreshBtn.addEventListener('click', () => { loadOrdersWithRetry(); showNotification('🔄 جاري تحديث الطلبات', 'info'); });
 
         DOM.tabs.forEach(tab => {
             tab.addEventListener('click', () => {
                 DOM.tabs.forEach(t => t.classList.remove('active'));
                 tab.classList.add('active');
-                const status = tab.dataset.status;
-                KitchenState.currentStatus = status;
-                filterCardsByStatus(status);
+                KitchenState.currentStatus = tab.dataset.status;
+                filterCardsByStatus(tab.dataset.status);
             });
         });
 
         DOM.receiveBtn.addEventListener('click', () => {
             if (!KitchenState.currentAlertOrder) return;
-            
             closePopup();
-            
-            const orderId = KitchenState.currentAlertOrder.orderId;
+            const orderId = KitchenState.currentAlertOrder?.orderId;
             const order = KitchenState.orders.find(o => o.orderId === orderId);
-            
             if (order) {
-                // لا حاجة لتغيير الحالة، هو أصلاً preparing
                 updateStats();
-                
                 const card = KitchenState.orderElements.get(orderId);
                 if (card) {
-                    updateCardContent(card, order);
-                    card.dataset.status = 'preparing';
-                    delete card.dataset.completedAt;
-                    sortCardsByTime();
-                    filterCardsByStatus(KitchenState.currentStatus);
+                    updateCardContent(card, order); card.dataset.status = 'preparing';
+                    delete card.dataset.completedAt; sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus);
                 }
-                
-                // حفظ في IndexedDB
-                DB.putOrders([order]).catch(e => console.warn('فشل حفظ بعد الاستلام', e));
+                DB.putOrders([order]).catch(() => {});
             }
-            
             showNotification('✅ تم استلام الطلب', 'success');
         });
 
         DOM.closePopupBtn.addEventListener('click', closePopup);
-
-        DOM.popupOverlay.addEventListener('click', (e) => {
-            if (e.target === DOM.popupOverlay) {
-                closePopup();
-            }
-        });
-
-        window.addEventListener('storage', (e) => {
-            if (e.key === CONFIG.CACHE_KEY && KitchenState.active) {
-                console.log('تم تحديث الطلبات في نافذة أخرى');
-                loadFromLocalStorage();
-            }
-        });
+        DOM.popupOverlay.addEventListener('click', (e) => { if (e.target === DOM.popupOverlay) closePopup(); });
+        DOM.closeModifyPopupBtn.addEventListener('click', closeModifyPopup);
+        DOM.acknowledgeModifyBtn.addEventListener('click', closeModifyPopup);
+        DOM.modifyPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.modifyPopupOverlay) closeModifyPopup(); });
+        window.addEventListener('storage', (e) => { if (e.key === CONFIG.CACHE_KEY && KitchenState.active) loadFromLocalStorage(); });
     </script>
 </body>
 </html>
