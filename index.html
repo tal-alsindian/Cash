@@ -48,6 +48,10 @@
             --modified-orange: #FF8C00;
             --modified-orange-dark: #b85400;
             --modified-orange-light: rgba(255, 140, 0, 0.12);
+            /* نقل الطاولة - أزرق */
+            --transfer-blue: #1565C0;
+            --transfer-blue-light: #1976D2;
+            --transfer-blue-glow: rgba(21, 101, 192, 0.35);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -146,7 +150,7 @@
         .stat-number { font-size: 1.8rem; font-weight: 900; line-height: 1.2; }
         .stat-card div:last-child { font-size: 0.8rem; font-weight: 600; opacity: 0.9; }
 
-        .controls { display: flex; gap: 12px; justify-content: center; align-items: center; }
+        .controls { display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; }
 
         .control-btn {
             width: 48px; height: 48px; border-radius: 50%;
@@ -156,6 +160,25 @@
             box-shadow: var(--shadow-sm); position: relative;
         }
         .control-btn:hover { transform: rotate(180deg) scale(1.05); background: var(--clay-brown); border-color: var(--cream-white); }
+
+        /* زر تحرير جميع الطاولات */
+        .control-btn-free-all {
+            width: auto; height: 48px; border-radius: 30px;
+            background: linear-gradient(145deg, #7b1a1a, #b33333);
+            color: var(--cream-white); border: 2px solid rgba(255,255,255,0.3);
+            font-size: 0.88rem; font-weight: 900; cursor: pointer;
+            padding: 0 16px; gap: 7px;
+            transition: all 0.3s; display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 14px rgba(150,30,30,0.4); white-space: nowrap;
+            font-family: 'Cairo', sans-serif;
+        }
+        .control-btn-free-all:hover {
+            background: linear-gradient(145deg, #991f1f, #cc3333);
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 8px 20px rgba(150,30,30,0.55);
+            border-color: rgba(255,255,255,0.5);
+        }
+        .control-btn-free-all:active { transform: scale(0.97); }
 
         .spinner { animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -181,7 +204,6 @@
             transition: all 0.3s; display: flex; flex-direction: column; animation: cardFade 0.4s;
         }
 
-        /* ===== بطاقة الطلب المعدَّل - برتقالية ===== */
         .order-card.modified {
             border: 3px solid var(--modified-orange) !important;
             box-shadow: 0 0 0 4px rgba(255,140,0,0.18), var(--shadow-md) !important;
@@ -223,11 +245,9 @@
         .order-card.modified .table-number-large { color: var(--modified-orange-dark); }
         .order-card.modified .table-number-large i { color: var(--modified-orange); }
 
-        /* ===== قسم "التعديلات الجديدة" ===== */
         .new-modifications-section {
             margin: 14px 0 6px;
-            border-radius: 18px;
-            overflow: hidden;
+            border-radius: 18px; overflow: hidden;
             border: 2.5px solid var(--modified-orange);
             box-shadow: 0 4px 16px rgba(255,140,0,0.18);
             animation: modSectionAppear 0.5s cubic-bezier(0.18,0.89,0.32,1.2);
@@ -239,22 +259,17 @@
 
         .new-modifications-header {
             background: linear-gradient(135deg, #b85400, #d96800, #FF8C00);
-            padding: 10px 14px;
-            display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px; display: flex; align-items: center; gap: 8px;
             position: relative; overflow: hidden;
         }
         .new-modifications-header::before {
-            content: '';
-            position: absolute; inset: 0;
+            content: ''; position: absolute; inset: 0;
             background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(255,255,255,0.06) 6px, rgba(255,255,255,0.06) 12px);
         }
         .new-modifications-header-icon {
-            width: 30px; height: 30px;
-            background: rgba(255,255,255,0.22);
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; color: white;
-            border: 2px solid rgba(255,255,255,0.5);
+            width: 30px; height: 30px; background: rgba(255,255,255,0.22);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; color: white; border: 2px solid rgba(255,255,255,0.5);
             flex-shrink: 0; position: relative; z-index: 1;
             animation: modIconSpin 2s ease infinite alternate;
         }
@@ -266,87 +281,96 @@
             position: relative; z-index: 1; letter-spacing: 0.3px;
         }
         .new-modifications-count {
-            margin-right: auto;
-            background: rgba(255,255,255,0.25);
-            color: white; border-radius: 20px;
-            padding: 2px 10px; font-size: 0.78rem; font-weight: 900;
-            border: 1.5px solid rgba(255,255,255,0.4);
-            position: relative; z-index: 1;
+            margin-right: auto; background: rgba(255,255,255,0.25);
+            color: white; border-radius: 20px; padding: 2px 10px;
+            font-size: 0.78rem; font-weight: 900;
+            border: 1.5px solid rgba(255,255,255,0.4); position: relative; z-index: 1;
         }
 
-        .new-modifications-body {
-            background: #fff8ef;
-            padding: 12px 14px;
-        }
+        .new-modifications-body { background: #fff8ef; padding: 12px 14px; }
 
         .mod-item {
-            display: flex; align-items: center; gap: 8px;
-            padding: 8px 10px; margin-bottom: 8px;
-            background: white;
-            border-radius: 12px;
-            border: 1.5px solid rgba(255,140,0,0.25);
-            box-shadow: 0 2px 8px rgba(255,140,0,0.08);
+            display: flex; align-items: center; gap: 8px; padding: 8px 10px; margin-bottom: 8px;
+            background: white; border-radius: 12px;
+            border: 1.5px solid rgba(255,140,0,0.25); box-shadow: 0 2px 8px rgba(255,140,0,0.08);
         }
         .mod-item:last-child { margin-bottom: 0; }
+        .mod-item-icon { width: 28px; height: 28px; background: linear-gradient(135deg, #FF8C00, #d96800); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; color: white; flex-shrink: 0; }
+        .mod-item-name { flex: 1; font-size: 0.9rem; font-weight: 700; color: var(--forest-green); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .mod-item-qty { background: var(--modified-orange); color: white; border-radius: 10px; padding: 2px 9px; font-size: 0.78rem; font-weight: 900; flex-shrink: 0; }
+        .mod-item-price { font-size: 0.82rem; font-weight: 800; color: var(--modified-orange-dark); flex-shrink: 0; }
 
-        .mod-item-icon {
-            width: 28px; height: 28px;
-            background: linear-gradient(135deg, #FF8C00, #d96800);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 0.75rem; color: white; flex-shrink: 0;
-        }
-        .mod-item-name {
-            flex: 1; font-size: 0.9rem; font-weight: 700;
-            color: var(--forest-green); overflow: hidden;
-            text-overflow: ellipsis; white-space: nowrap;
-        }
-        .mod-item-qty {
-            background: var(--modified-orange); color: white;
-            border-radius: 10px; padding: 2px 9px;
-            font-size: 0.78rem; font-weight: 900; flex-shrink: 0;
-        }
-        .mod-item-price {
-            font-size: 0.82rem; font-weight: 800;
-            color: var(--modified-orange-dark); flex-shrink: 0;
-        }
-
-        /* تغيير الكمية */
         .mod-qty-change {
-            display: flex; align-items: center; gap: 6px;
-            padding: 7px 10px; margin-bottom: 8px;
-            background: #fff3e0;
-            border-radius: 12px;
-            border: 1.5px dashed rgba(255,140,0,0.4);
+            display: flex; align-items: center; gap: 6px; padding: 7px 10px; margin-bottom: 8px;
+            background: #fff3e0; border-radius: 12px; border: 1.5px dashed rgba(255,140,0,0.4);
         }
         .mod-qty-change:last-child { margin-bottom: 0; }
-        .mod-qty-icon {
-            width: 26px; height: 26px;
-            background: linear-gradient(135deg, #e67600, #b85400);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; color: white; flex-shrink: 0;
-        }
+        .mod-qty-icon { width: 26px; height: 26px; background: linear-gradient(135deg, #e67600, #b85400); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; flex-shrink: 0; }
         .mod-qty-name { flex: 1; font-size: 0.85rem; font-weight: 700; color: #7a4000; }
         .mod-qty-arrow { font-size: 0.75rem; color: #b85400; font-weight: 900; }
         .mod-qty-old { background: rgba(0,0,0,0.1); border-radius: 8px; padding: 1px 7px; font-size: 0.78rem; color: #888; text-decoration: line-through; }
         .mod-qty-new { background: var(--modified-orange); color: white; border-radius: 8px; padding: 1px 7px; font-size: 0.78rem; font-weight: 900; }
 
-        /* صنف محذوف */
         .mod-removed {
-            display: flex; align-items: center; gap: 8px;
-            padding: 7px 10px; margin-bottom: 8px;
-            background: #fff0f0;
-            border-radius: 12px;
-            border: 1.5px dashed rgba(180,30,30,0.3);
+            display: flex; align-items: center; gap: 8px; padding: 7px 10px; margin-bottom: 8px;
+            background: #fff0f0; border-radius: 12px; border: 1.5px dashed rgba(180,30,30,0.3);
         }
         .mod-removed:last-child { margin-bottom: 0; }
-        .mod-removed-icon {
-            width: 26px; height: 26px;
-            background: linear-gradient(135deg, #cc3300, #991f00);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 0.7rem; color: white; flex-shrink: 0;
-        }
+        .mod-removed-icon { width: 26px; height: 26px; background: linear-gradient(135deg, #cc3300, #991f00); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; flex-shrink: 0; }
         .mod-removed-name { flex: 1; font-size: 0.85rem; font-weight: 700; color: #991f00; text-decoration: line-through; }
         .mod-removed-label { font-size: 0.75rem; background: #cc3300; color: white; border-radius: 8px; padding: 1px 8px; font-weight: 800; }
+
+        /* ===== تنبيه نقل الطاولة داخل الطلب ===== */
+        .transfer-notice {
+            margin: 12px 0 6px;
+            border-radius: 16px; overflow: hidden;
+            border: 2px solid var(--transfer-blue);
+            box-shadow: 0 4px 14px rgba(21,101,192,0.15);
+            animation: modSectionAppear 0.5s cubic-bezier(0.18,0.89,0.32,1.2);
+        }
+        .transfer-notice-header {
+            background: linear-gradient(135deg, #0d3c7a, #1565C0, #1976D2);
+            padding: 9px 14px; display: flex; align-items: center; gap: 8px;
+            position: relative; overflow: hidden;
+        }
+        .transfer-notice-header::before {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 6px, rgba(255,255,255,0.06) 6px, rgba(255,255,255,0.06) 12px);
+        }
+        .transfer-notice-icon {
+            width: 28px; height: 28px; background: rgba(255,255,255,0.22);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 0.82rem; color: white; border: 2px solid rgba(255,255,255,0.5);
+            flex-shrink: 0; position: relative; z-index: 1;
+        }
+        .transfer-notice-title {
+            font-size: 0.9rem; font-weight: 900; color: white;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.25);
+            position: relative; z-index: 1;
+        }
+        .transfer-notice-time {
+            margin-right: auto; background: rgba(255,255,255,0.2);
+            color: white; border-radius: 16px; padding: 2px 9px;
+            font-size: 0.72rem; font-weight: 700;
+            border: 1px solid rgba(255,255,255,0.35); position: relative; z-index: 1;
+        }
+        .transfer-notice-body {
+            background: #f0f5ff; padding: 11px 14px;
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+        }
+        .transfer-notice-box {
+            flex: 1; border-radius: 12px; padding: 8px 10px; text-align: center;
+            border: 2px solid; font-weight: 900;
+        }
+        .transfer-notice-box.from {
+            background: rgba(255,140,0,0.1); border-color: var(--modified-orange); color: var(--modified-orange-dark);
+        }
+        .transfer-notice-box.to {
+            background: rgba(21,101,192,0.1); border-color: var(--transfer-blue); color: var(--transfer-blue);
+        }
+        .transfer-notice-box .n-label { font-size: 0.62rem; font-weight: 800; opacity: 0.75; margin-bottom: 4px; display: block; }
+        .transfer-notice-box .n-num  { font-size: 1.6rem; font-weight: 900; line-height: 1; }
+        .transfer-notice-arrow { font-size: 1.3rem; color: var(--transfer-blue); flex-shrink: 0; }
 
         .order-card.hidden-by-tab { display: none !important; }
         .order-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); border-color: var(--forest-green); }
@@ -393,6 +417,18 @@
         .btn-print { background: var(--clay-brown); }
         .btn-delete { background: #b33; }
         .action-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 18px rgba(0,0,0,0.2); border-color: var(--cream-white); }
+
+        /* ===== زر نقل الطاولة ===== */
+        .btn-transfer {
+            background: linear-gradient(145deg, var(--transfer-blue), var(--transfer-blue-light));
+            border: 2px solid rgba(255,255,255,0.3);
+            box-shadow: 0 4px 12px var(--transfer-blue-glow);
+        }
+        .btn-transfer:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--transfer-blue-glow);
+            border-color: var(--cream-white);
+        }
 
         .empty-state { grid-column: 1 / -1; text-align: center; padding: 60px 16px; background: var(--cream-white); border-radius: 30px; border: 3px solid var(--clay-brown); box-shadow: var(--shadow-md); }
         .empty-state i { font-size: 5rem; color: var(--forest-green); opacity: 0.5; margin-bottom: 16px; }
@@ -463,12 +499,179 @@
         .modify-items-preview .preview-item .p-price { color: #b85400; font-weight: 800; font-size: 0.82rem; flex-shrink: 0; }
         .modify-notes-preview { background: #fff8e6; border-right: 4px solid #FF8C00; padding: 8px 12px; border-radius: 10px; margin-top: 8px; font-size: 0.82rem; color: #7a4000; font-weight: 600; }
 
+        /* ===== بوبأب نقل الطاولة - أزرق ===== */
+        .transfer-popup-overlay { z-index: 9997; }
+        .transfer-popup {
+            border: 3px solid var(--transfer-blue) !important;
+            box-shadow: var(--shadow-lg), 0 0 0 8px rgba(21,101,192,0.15) !important;
+        }
+        .transfer-header {
+            background: linear-gradient(145deg, #0d3c7a, #1565C0, #1976D2) !important;
+            position: relative; overflow: hidden;
+        }
+        .transfer-header::before {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.06) 8px, rgba(255,255,255,0.06) 16px);
+            pointer-events: none;
+        }
+        .transfer-icon {
+            background: rgba(255,255,255,0.22) !important;
+            border-color: rgba(255,255,255,0.55) !important;
+            animation: transferIconSpin 2s ease infinite alternate;
+        }
+        @keyframes transferIconSpin { 0%{transform:rotate(-15deg) scale(1)} 100%{transform:rotate(15deg) scale(1.1)} }
+
+        .transfer-table-display {
+            display: flex; align-items: center; justify-content: center;
+            gap: 16px; margin-bottom: 20px;
+        }
+        .transfer-table-box {
+            flex: 1; border-radius: 22px; padding: 16px 10px; text-align: center;
+            border: 3px solid; font-weight: 900;
+        }
+        .transfer-table-box.from {
+            background: rgba(255,140,0,0.1);
+            border-color: var(--modified-orange);
+            color: var(--modified-orange-dark);
+        }
+        .transfer-table-box.to {
+            background: rgba(21,101,192,0.08);
+            border-color: var(--transfer-blue);
+            color: var(--transfer-blue);
+        }
+        .transfer-table-box .t-label {
+            font-size: 0.72rem; font-weight: 800; opacity: 0.8; margin-bottom: 6px; display: block;
+        }
+        .transfer-table-box .t-num {
+            font-size: 2.2rem; font-weight: 900; line-height: 1;
+        }
+        .transfer-arrow {
+            font-size: 1.6rem; color: var(--transfer-blue);
+            animation: arrowPulse 1s ease infinite alternate;
+        }
+        @keyframes arrowPulse { 0%{transform:translateX(0)} 100%{transform:translateX(-5px)} }
+
+        .transfer-label-row {
+            font-size: 0.82rem; color: #555; font-weight: 600; margin-bottom: 6px;
+        }
+
+        /* حقل الإدخال الخاص بنقل الطاولة */
+        .transfer-input-wrap {
+            display: flex; gap: 10px; margin-bottom: 16px; align-items: center;
+        }
+        .transfer-input {
+            flex: 1; padding: 14px 18px; border: 2.5px solid var(--transfer-blue);
+            border-radius: 18px; font-family: 'Cairo', sans-serif; font-size: 1.3rem;
+            font-weight: 900; color: var(--transfer-blue); text-align: center;
+            background: rgba(21,101,192,0.05); outline: none; transition: all 0.2s;
+            direction: ltr;
+        }
+        .transfer-input:focus { border-color: #0d3c7a; background: rgba(21,101,192,0.1); box-shadow: 0 0 0 4px rgba(21,101,192,0.15); }
+
+        /* شبكة أرقام سريعة */
+        .quick-tables-grid {
+            display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; margin-bottom: 16px;
+            max-height: 180px; overflow-y: auto;
+        }
+        .quick-table-btn {
+            padding: 8px 4px; border: 2px solid rgba(21,101,192,0.25);
+            border-radius: 12px; background: rgba(21,101,192,0.05);
+            color: var(--transfer-blue); font-weight: 900; font-size: 0.9rem;
+            cursor: pointer; transition: all 0.18s; text-align: center;
+            font-family: 'Cairo', sans-serif;
+        }
+        .quick-table-btn:hover {
+            background: var(--transfer-blue); color: white; border-color: var(--transfer-blue);
+            transform: scale(1.08);
+        }
+        .quick-table-btn.occupied {
+            background: rgba(255,140,0,0.08); border-color: rgba(255,140,0,0.4);
+            color: var(--modified-orange-dark);
+        }
+        .quick-table-btn.occupied:hover {
+            background: var(--modified-orange); color: white; border-color: var(--modified-orange);
+        }
+        .quick-table-btn.selected {
+            background: var(--transfer-blue); color: white; border-color: #0d3c7a;
+            box-shadow: 0 4px 10px var(--transfer-blue-glow);
+        }
+        .quick-table-btn.disabled-table {
+            opacity: 0.35; cursor: not-allowed; pointer-events: none;
+        }
+
+        .transfer-confirm-btn {
+            width: 100%; padding: 15px; background: linear-gradient(145deg, #0d3c7a, var(--transfer-blue));
+            color: white; border: none; border-radius: 30px; font-size: 1.05rem; font-weight: 900;
+            cursor: pointer; border: 2px solid rgba(255,255,255,0.25); transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'Cairo', sans-serif;
+        }
+        .transfer-confirm-btn:hover { background: linear-gradient(145deg, #0d3c7a, #0e4fb5); box-shadow: 0 8px 20px var(--transfer-blue-glow); }
+        .transfer-confirm-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+
+        .transfer-cancel-btn {
+            width: 100%; padding: 12px; background: transparent;
+            color: #888; border: 2px solid rgba(0,0,0,0.12); border-radius: 30px;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer; margin-top: 8px;
+            transition: all 0.2s; font-family: 'Cairo', sans-serif;
+        }
+        .transfer-cancel-btn:hover { background: rgba(0,0,0,0.05); color: #555; }
+
+        .quick-tables-label {
+            font-size: 0.78rem; font-weight: 800; color: var(--transfer-blue);
+            margin-bottom: 8px; display: flex; align-items: center; gap: 5px;
+        }
+
+        /* ===== بوبأب تأكيد تحرير جميع الطاولات ===== */
+        .free-all-popup-overlay { z-index: 9996; }
+        .free-all-popup {
+            border: 3px solid #b33 !important;
+            box-shadow: var(--shadow-lg), 0 0 0 8px rgba(180,50,50,0.15) !important;
+        }
+        .free-all-header {
+            background: linear-gradient(145deg, #7b1a1a, #b33333, #cc4444) !important;
+            position: relative; overflow: hidden;
+        }
+        .free-all-header::before {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-linear-gradient(45deg, transparent, transparent 8px, rgba(255,255,255,0.06) 8px, rgba(255,255,255,0.06) 16px);
+            pointer-events: none;
+        }
+        .free-all-icon {
+            background: rgba(255,255,255,0.22) !important;
+            border-color: rgba(255,255,255,0.55) !important;
+            animation: freeAllIconPulse 1.5s ease infinite alternate;
+        }
+        @keyframes freeAllIconPulse { 0%{transform:scale(1)} 100%{transform:scale(1.18)} }
+        .free-all-warning {
+            background: #fff0f0; border: 2px solid rgba(180,50,50,0.3);
+            border-radius: 18px; padding: 16px; margin-bottom: 18px; text-align: center;
+        }
+        .free-all-warning .warning-icon { font-size: 2.5rem; margin-bottom: 8px; }
+        .free-all-warning p { font-size: 0.92rem; font-weight: 700; color: #7b1a1a; line-height: 1.6; }
+        .free-all-confirm-btn {
+            width: 100%; padding: 15px; background: linear-gradient(145deg, #7b1a1a, #b33333);
+            color: white; border: none; border-radius: 30px; font-size: 1.05rem; font-weight: 900;
+            cursor: pointer; border: 2px solid rgba(255,255,255,0.25); transition: all 0.2s;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            font-family: 'Cairo', sans-serif; margin-bottom: 10px;
+        }
+        .free-all-confirm-btn:hover { background: linear-gradient(145deg, #991f1f, #cc3333); box-shadow: 0 8px 20px rgba(150,30,30,0.45); }
+        .free-all-cancel-btn {
+            width: 100%; padding: 12px; background: transparent;
+            color: #888; border: 2px solid rgba(0,0,0,0.12); border-radius: 30px;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            transition: all 0.2s; font-family: 'Cairo', sans-serif;
+        }
+        .free-all-cancel-btn:hover { background: rgba(0,0,0,0.05); color: #555; }
+
         @media (max-width: 380px) {
             .header-logo h1 { font-size: 1.1rem; }
             .stat-number { font-size: 1.5rem; }
             .kitchen-tab { padding: 10px 12px; font-size: 0.9rem; }
             .order-id { font-size: 1rem; }
             .table-number-large { font-size: 2.2rem; }
+            .control-btn-free-all { font-size: 0.78rem; padding: 0 10px; }
         }
     </style>
 </head>
@@ -510,6 +713,11 @@
                 </button>
                 <button class="control-btn" id="refreshBtn">
                     <i class="fas fa-sync-alt"></i>
+                </button>
+                <!-- ===== زر تحرير جميع الطاولات ===== -->
+                <button class="control-btn-free-all" id="freeAllTablesBtn">
+                    <i class="fas fa-door-open"></i>
+                    تحرير جميع الطاولات
                 </button>
             </div>
         </header>
@@ -624,6 +832,84 @@
         </div>
     </div>
 
+    <!-- ===== بوبأب نقل الطاولة (أزرق) ===== -->
+    <div id="transferPopupOverlay" class="popup-overlay transfer-popup-overlay">
+        <div class="order-popup transfer-popup">
+            <div class="popup-header transfer-header">
+                <div class="popup-header-content">
+                    <div class="popup-header-icon transfer-icon"><i class="fas fa-exchange-alt"></i></div>
+                    <div class="popup-header-text">
+                        <h2>نقل الطاولة</h2>
+                        <p>اختر الطاولة الجديدة للزبائن</p>
+                    </div>
+                </div>
+                <button class="popup-close" id="closeTransferPopupBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="popup-body">
+                <div class="transfer-table-display">
+                    <div class="transfer-table-box from">
+                        <span class="t-label">من طاولة</span>
+                        <div class="t-num" id="transferFromNum">-</div>
+                    </div>
+                    <div class="transfer-arrow"><i class="fas fa-arrow-left"></i></div>
+                    <div class="transfer-table-box to">
+                        <span class="t-label">إلى طاولة</span>
+                        <div class="t-num" id="transferToPreview">-</div>
+                    </div>
+                </div>
+
+                <div class="transfer-label-row">أدخل رقم الطاولة الجديدة أو اختر من القائمة:</div>
+                <div class="transfer-input-wrap">
+                    <input type="number" id="transferTableInput" class="transfer-input"
+                           min="1" max="40" placeholder="رقم الطاولة" />
+                </div>
+
+                <div class="quick-tables-label">
+                    <i class="fas fa-th"></i> اختيار سريع
+                    <span style="font-size:0.7rem;opacity:0.7;font-weight:600;margin-right:6px;">🟠 مشغولة</span>
+                </div>
+                <div class="quick-tables-grid" id="quickTablesGrid"></div>
+
+                <button id="confirmTransferBtn" class="transfer-confirm-btn" disabled>
+                    <i class="fas fa-exchange-alt"></i>
+                    تأكيد النقل
+                </button>
+                <button id="cancelTransferBtn" class="transfer-cancel-btn">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== بوبأب تحرير جميع الطاولات ===== -->
+    <div id="freeAllPopupOverlay" class="popup-overlay free-all-popup-overlay">
+        <div class="order-popup free-all-popup">
+            <div class="popup-header free-all-header">
+                <div class="popup-header-content">
+                    <div class="popup-header-icon free-all-icon"><i class="fas fa-door-open"></i></div>
+                    <div class="popup-header-text">
+                        <h2>تحرير جميع الطاولات</h2>
+                        <p>تأكيد العملية</p>
+                    </div>
+                </div>
+                <button class="popup-close" id="closeFreeAllPopupBtn"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="popup-body">
+                <div class="free-all-warning">
+                    <div class="warning-icon">⚠️</div>
+                    <p>هل أنت متأكد من تحرير <strong>جميع الطاولات</strong>؟<br>سيتم تغيير حالة كل الطاولات إلى <strong>"حرة"</strong>.<br>هذه العملية لا يمكن التراجع عنها.</p>
+                </div>
+                <button id="confirmFreeAllBtn" class="free-all-confirm-btn">
+                    <i class="fas fa-door-open"></i>
+                    نعم، تحرير جميع الطاولات
+                </button>
+                <button id="cancelFreeAllBtn" class="free-all-cancel-btn">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
     <audio id="notificationSound" preload="auto" loop>
         <source src="https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3" type="audio/mpeg">
     </audio>
@@ -642,8 +928,10 @@
             FETCH_TIMEOUT: 8000,
             MAX_RETRIES: 3,
             CACHE_KEY: 'tel_alsindian_orders_backup',
-            // ======== مفتاح التخزين الدائم للتعديلات ========
             MODIFIED_ORDERS_KEY: 'tel_alsindian_modified_orders',
+            // ===== مفتاح تخزين سجلات نقل الطاولة =====
+            TRANSFER_LOG_KEY: 'tel_alsindian_transfer_logs',
+            TABLE_COUNT: 40,
         };
 
         const TABLE_STATUS_KEY = 'tel_sindian_table_status';
@@ -670,38 +958,51 @@
             saveTableStatuses(statuses);
         }
 
-        // ======================== حفظ/تحميل التعديلات من localStorage ========================
-        /**
-         * هيكل البيانات المحفوظة:
-         * {
-         *   "TSN-0001": {
-         *     diff: { added: [...], removed: [...], changed: [...] },
-         *     modifiedAt: "...",
-         *     newItems: [...],   // الأصناف الجديدة الكاملة بعد التعديل
-         *     newTotal: "...",
-         *     newNotes: "..."
-         *   }, ...
-         * }
-         */
+        function getTableStatus(tableNum) {
+            const statuses = loadTableStatuses();
+            return statuses[String(tableNum)] || statuses[tableNum] || 'free';
+        }
+
+        // ======================== سجلات نقل الطاولات ========================
+        function loadTransferLogs() {
+            try { return JSON.parse(localStorage.getItem(CONFIG.TRANSFER_LOG_KEY) || '{}'); }
+            catch(e) { return {}; }
+        }
+        function saveTransferLogs(logs) {
+            try { localStorage.setItem(CONFIG.TRANSFER_LOG_KEY, JSON.stringify(logs)); } catch(e) {}
+        }
+        function addTransferLog(orderId, fromTable, toTable) {
+            const logs = loadTransferLogs();
+            if (!logs[orderId]) logs[orderId] = [];
+            logs[orderId].push({
+                from: String(fromTable),
+                to: String(toTable),
+                at: new Date().toISOString()
+            });
+            saveTransferLogs(logs);
+            // حفظ في KitchenState أيضاً
+            if (!KitchenState.transferLogs[orderId]) KitchenState.transferLogs[orderId] = [];
+            KitchenState.transferLogs[orderId].push({ from: String(fromTable), to: String(toTable), at: new Date().toISOString() });
+        }
+        function getTransferLogs(orderId) {
+            const logs = KitchenState.transferLogs[orderId] || loadTransferLogs()[orderId];
+            return logs || [];
+        }
+
+        // ======================== حفظ/تحميل التعديلات ========================
         function loadModifiedOrdersFromStorage() {
-            try {
-                return JSON.parse(localStorage.getItem(CONFIG.MODIFIED_ORDERS_KEY) || '{}');
-            } catch(e) { return {}; }
+            try { return JSON.parse(localStorage.getItem(CONFIG.MODIFIED_ORDERS_KEY) || '{}'); }
+            catch(e) { return {}; }
         }
-
         function saveModifiedOrdersToStorage(modifiedOrders) {
-            try {
-                localStorage.setItem(CONFIG.MODIFIED_ORDERS_KEY, JSON.stringify(modifiedOrders));
-            } catch(e) {}
+            try { localStorage.setItem(CONFIG.MODIFIED_ORDERS_KEY, JSON.stringify(modifiedOrders)); } catch(e) {}
         }
-
         function addModifiedOrder(orderId, modData) {
             const all = loadModifiedOrdersFromStorage();
             all[orderId] = modData;
             saveModifiedOrdersToStorage(all);
             KitchenState.modifiedOrders[orderId] = modData;
         }
-
         function removeModifiedOrder(orderId) {
             const all = loadModifiedOrdersFromStorage();
             delete all[orderId];
@@ -772,13 +1073,17 @@
         const KitchenState = {
             active: false, soundEnabled: true, currentStatus: 'preparing',
             orders: [], lastOrderIds: new Set(), popupActive: false,
-            modifyPopupActive: false,
+            modifyPopupActive: false, transferPopupActive: false, freeAllPopupActive: false,
             currentAlertOrder: null, timerInterval: null, refreshInterval: null,
             initialLoad: true, isLoading: false, retryCount: 0,
             online: navigator.onLine, orderElements: new Map(),
             currentRefreshInterval: CONFIG.REFRESH_INTERVAL,
-            // ======== يُحمَّل من localStorage عند البدء ========
-            modifiedOrders: {}
+            modifiedOrders: {},
+            transferLogs: {},  // ===== سجلات نقل الطاولة =====
+            // حالة نقل الطاولة
+            transferOrderId: null,
+            transferFromTable: null,
+            transferToTable: null,
         };
 
         const DOM = {
@@ -792,6 +1097,7 @@
             completedBadge: document.getElementById('completedBadge'),
             soundToggle: document.getElementById('soundToggle'),
             refreshBtn: document.getElementById('refreshBtn'),
+            freeAllTablesBtn: document.getElementById('freeAllTablesBtn'),
             tabs: document.querySelectorAll('.kitchen-tab'),
             notificationSound: document.getElementById('notificationSound'),
             modifySound: document.getElementById('modifySound'),
@@ -812,6 +1118,20 @@
             modifyPopupTime: document.getElementById('modifyPopupTime'),
             modifyPopupTotal: document.getElementById('modifyPopupTotal'),
             modifyItemsPreview: document.getElementById('modifyItemsPreview'),
+            // نقل الطاولة
+            transferPopupOverlay: document.getElementById('transferPopupOverlay'),
+            closeTransferPopupBtn: document.getElementById('closeTransferPopupBtn'),
+            confirmTransferBtn: document.getElementById('confirmTransferBtn'),
+            cancelTransferBtn: document.getElementById('cancelTransferBtn'),
+            transferFromNum: document.getElementById('transferFromNum'),
+            transferToPreview: document.getElementById('transferToPreview'),
+            transferTableInput: document.getElementById('transferTableInput'),
+            quickTablesGrid: document.getElementById('quickTablesGrid'),
+            // تحرير جميع الطاولات
+            freeAllPopupOverlay: document.getElementById('freeAllPopupOverlay'),
+            closeFreeAllPopupBtn: document.getElementById('closeFreeAllPopupBtn'),
+            confirmFreeAllBtn: document.getElementById('confirmFreeAllBtn'),
+            cancelFreeAllBtn: document.getElementById('cancelFreeAllBtn'),
         };
 
         // ======================== دوال مساعدة ========================
@@ -873,97 +1193,82 @@
                 return result;
             }
             const oldMap = {};
-            oldItems.forEach(item => {
-                const key = (item.name || '').trim().toLowerCase();
-                oldMap[key] = { ...item };
-            });
+            oldItems.forEach(item => { const key = (item.name || '').trim().toLowerCase(); oldMap[key] = { ...item }; });
             const newMap = {};
+            newItems.forEach(item => { const key = (item.name || '').trim().toLowerCase(); newMap[key] = { ...item }; });
             newItems.forEach(item => {
                 const key = (item.name || '').trim().toLowerCase();
-                newMap[key] = { ...item };
-            });
-            newItems.forEach(item => {
-                const key = (item.name || '').trim().toLowerCase();
-                if (!oldMap[key]) {
-                    result.added.push({ ...item });
-                } else {
+                if (!oldMap[key]) { result.added.push({ ...item }); }
+                else {
                     const oldQty = extractNumber(oldMap[key].quantity);
                     const newQty = extractNumber(item.quantity);
-                    if (newQty !== oldQty) {
-                        result.changed.push({ ...item, oldQty, newQty });
-                    }
+                    if (newQty !== oldQty) result.changed.push({ ...item, oldQty, newQty });
                 }
             });
             oldItems.forEach(item => {
                 const key = (item.name || '').trim().toLowerCase();
-                if (!newMap[key]) {
-                    result.removed.push({ ...item });
-                }
+                if (!newMap[key]) result.removed.push({ ...item });
             });
             return result;
         }
 
-        // ======================== بناء HTML قسم التعديلات ========================
         function buildModificationsHTML(diff) {
             if (!diff) return '';
             const totalChanges = diff.added.length + diff.removed.length + diff.changed.length;
             if (totalChanges === 0) return '';
-
             let itemsHTML = '';
             diff.added.forEach(item => {
-                const price = extractNumber(item.price);
-                const qty = extractNumber(item.quantity);
-                itemsHTML += `
-                    <div class="mod-item">
-                        <div class="mod-item-icon"><i class="fas fa-plus"></i></div>
-                        <span class="mod-item-name">${item.name || 'صنف'}</span>
-                        <span class="mod-item-qty">×${qty}</span>
-                        <span class="mod-item-price">${(price * qty).toFixed(2)} د.أ</span>
-                    </div>`;
+                const price = extractNumber(item.price); const qty = extractNumber(item.quantity);
+                itemsHTML += `<div class="mod-item"><div class="mod-item-icon"><i class="fas fa-plus"></i></div><span class="mod-item-name">${item.name||'صنف'}</span><span class="mod-item-qty">×${qty}</span><span class="mod-item-price">${(price*qty).toFixed(2)} د.أ</span></div>`;
             });
             diff.changed.forEach(item => {
-                itemsHTML += `
-                    <div class="mod-qty-change">
-                        <div class="mod-qty-icon"><i class="fas fa-arrows-alt-v"></i></div>
-                        <span class="mod-qty-name">${item.name || 'صنف'}</span>
-                        <span class="mod-qty-old">×${item.oldQty}</span>
-                        <span class="mod-qty-arrow">←</span>
-                        <span class="mod-qty-new">×${item.newQty}</span>
-                    </div>`;
+                itemsHTML += `<div class="mod-qty-change"><div class="mod-qty-icon"><i class="fas fa-arrows-alt-v"></i></div><span class="mod-qty-name">${item.name||'صنف'}</span><span class="mod-qty-old">×${item.oldQty}</span><span class="mod-qty-arrow">←</span><span class="mod-qty-new">×${item.newQty}</span></div>`;
             });
             diff.removed.forEach(item => {
-                itemsHTML += `
-                    <div class="mod-removed">
-                        <div class="mod-removed-icon"><i class="fas fa-minus"></i></div>
-                        <span class="mod-removed-name">${item.name || 'صنف'}</span>
-                        <span class="mod-removed-label">محذوف</span>
-                    </div>`;
+                itemsHTML += `<div class="mod-removed"><div class="mod-removed-icon"><i class="fas fa-minus"></i></div><span class="mod-removed-name">${item.name||'صنف'}</span><span class="mod-removed-label">محذوف</span></div>`;
             });
+            return `<div class="new-modifications-section"><div class="new-modifications-header"><div class="new-modifications-header-icon"><i class="fas fa-pencil-alt"></i></div><span class="new-modifications-title">✨ التعديلات الجديدة</span><span class="new-modifications-count">${totalChanges} تغيير</span></div><div class="new-modifications-body">${itemsHTML}</div></div>`;
+        }
 
-            return `
-                <div class="new-modifications-section">
-                    <div class="new-modifications-header">
-                        <div class="new-modifications-header-icon"><i class="fas fa-pencil-alt"></i></div>
-                        <span class="new-modifications-title">✨ التعديلات الجديدة</span>
-                        <span class="new-modifications-count">${totalChanges} تغيير</span>
+        // ======================== بناء HTML لتنبيه نقل الطاولة ========================
+        function buildTransferNoticesHTML(orderId) {
+            const logs = getTransferLogs(orderId);
+            if (!logs || logs.length === 0) return '';
+            // نعرض آخر عملية نقل بشكل بارز + تاريخ جميع العمليات
+            let html = '';
+            logs.forEach((log, idx) => {
+                const timeStr = log.at ? new Date(log.at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '-';
+                html += `
+                <div class="transfer-notice">
+                    <div class="transfer-notice-header">
+                        <div class="transfer-notice-icon"><i class="fas fa-exchange-alt"></i></div>
+                        <span class="transfer-notice-title">🔄 تم نقل الطاولة</span>
+                        <span class="transfer-notice-time">${timeStr}</span>
                     </div>
-                    <div class="new-modifications-body">${itemsHTML}</div>
+                    <div class="transfer-notice-body">
+                        <div class="transfer-notice-box from">
+                            <span class="n-label">من طاولة</span>
+                            <div class="n-num">${log.from}</div>
+                        </div>
+                        <div class="transfer-notice-arrow"><i class="fas fa-arrow-left"></i></div>
+                        <div class="transfer-notice-box to">
+                            <span class="n-label">إلى طاولة</span>
+                            <div class="n-num">${log.to}</div>
+                        </div>
+                    </div>
                 </div>`;
+            });
+            return html;
         }
 
         // ======================== معالجة الطلبات ========================
         async function processOrders(orders, options = {}) {
             const oldIds = new Set(KitchenState.orders.map(o => o.orderId));
-
-            // بناء خريطة للطلبات الموجودة في الذاكرة (تحمل الأصناف الصحيحة المُعدَّلة)
             const existingOrdersMap = {};
             KitchenState.orders.forEach(o => { existingOrdersMap[o.orderId] = o; });
 
             const newOrders = orders.map(o => {
                 const normalized = normalizeOrder(o);
-
-                // ======== حماية الطلبات المكتملة التي تم تعديلها ========
-                // إذا كان الطلب موجوداً في الذاكرة بحالة "مكتمل" نحافظ على أصنافه المحدَّثة
                 const existingOrder = existingOrdersMap[normalized.orderId];
                 if (existingOrder && existingOrder.status === 'completed' && existingOrder.items && existingOrder.items.length > 0) {
                     normalized.items = existingOrder.items;
@@ -971,39 +1276,37 @@
                     normalized.notes = existingOrder.notes;
                     normalized.completedAt = existingOrder.completedAt || normalized.completedAt;
                     normalized.status = 'completed';
+                    // الحفاظ على رقم الطاولة المحدّث (بعد النقل)
+                    if (existingOrder.tableNumber) normalized.tableNumber = existingOrder.tableNumber;
                     return normalized;
                 }
-
-                // ======== تطبيق البيانات المعدَّلة المحفوظة على الطلبات قيد التحضير ========
                 const modData = KitchenState.modifiedOrders[normalized.orderId];
                 if (modData && normalized.status === 'preparing') {
-                    if (modData.newItems && modData.newItems.length > 0) {
-                        normalized.items = modData.newItems.map(i => ({ ...i }));
-                    }
+                    if (modData.newItems && modData.newItems.length > 0) normalized.items = modData.newItems.map(i => ({ ...i }));
                     if (modData.newTotal) normalized.total = String(modData.newTotal);
                     if (modData.newNotes !== undefined) normalized.notes = modData.newNotes;
+                }
+                // الحفاظ على رقم الطاولة المحدّث بعد النقل
+                if (existingOrder && existingOrder.tableNumber) {
+                    normalized.tableNumber = existingOrder.tableNumber;
                 }
                 return normalized;
             });
             KitchenState.orders = newOrders;
             syncOrderCards(newOrders);
             updateStats();
-
             if (!options.initialLoad) {
                 const newOnes = newOrders.filter(o => !oldIds.has(o.orderId) && o.status === 'preparing');
                 if (newOnes.length > 0) showNewOrderPopup(newOnes[newOnes.length - 1]);
             } else {
                 KitchenState.initialLoad = false;
             }
-
-            try { await DB.putOrders(newOrders); }
-            catch(e) { saveToLocalStorage(newOrders); }
+            try { await DB.putOrders(newOrders); } catch(e) { saveToLocalStorage(newOrders); }
         }
 
         function syncOrderCards(orders) {
             const currentIds = new Set(KitchenState.orderElements.keys());
             const newIds = new Set(orders.map(o => o.orderId));
-
             for (let id of currentIds) {
                 if (!newIds.has(id)) {
                     const el = KitchenState.orderElements.get(id);
@@ -1011,7 +1314,6 @@
                     KitchenState.orderElements.delete(id);
                 }
             }
-
             orders.forEach(order => {
                 const isModified = !!KitchenState.modifiedOrders[order.orderId] && order.status === 'preparing';
                 const existing = KitchenState.orderElements.get(order.orderId);
@@ -1028,7 +1330,6 @@
                     DOM.ordersContainer.appendChild(newCard);
                 }
             });
-
             sortCardsByTime();
             filterCardsByStatus(KitchenState.currentStatus);
             if (KitchenState.orderElements.size === 0) showEmptyState();
@@ -1052,14 +1353,10 @@
             const tableNumber = order.tableNumber || '?';
             let timeStr = '-';
             if (order.timestamp) {
-                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); }
-                catch(e) { timeStr = '-'; }
+                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); } catch(e) {}
             }
             const displayTotal = calculateOrderTotal(order).toFixed(2);
-
-            const modifiedBadgeHTML = isModified
-                ? `<span class="modified-badge"><i class="fas fa-pencil-alt"></i> معدَّل</span>` : '';
-
+            const modifiedBadgeHTML = isModified ? `<span class="modified-badge"><i class="fas fa-pencil-alt"></i> معدَّل</span>` : '';
             let statusBadgeHTML = '';
             if (isModified && order.status === 'preparing') {
                 statusBadgeHTML = `<span class="status-badge status-modified"><i class="fas fa-pencil-alt"></i> معدَّل - قيد التحضير</span>`;
@@ -1068,13 +1365,14 @@
             } else {
                 statusBadgeHTML = `<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> مكتمل</span>`;
             }
-
-            // ===== قسم التعديلات =====
             let modificationsHTML = '';
             if (isModified && KitchenState.modifiedOrders[order.orderId]) {
                 const diff = KitchenState.modifiedOrders[order.orderId].diff;
                 if (diff) modificationsHTML = buildModificationsHTML(diff);
             }
+
+            // ===== تنبيهات نقل الطاولة =====
+            const transferNoticesHTML = buildTransferNoticesHTML(order.orderId);
 
             card.innerHTML = `
                 <div class="order-header">
@@ -1096,18 +1394,17 @@
                             const price = extractNumber(item.price);
                             const qty = extractNumber(item.quantity);
                             const itemTotal = (price * qty).toFixed(2);
-                            return `
-                                <div class="order-item">
-                                    <div class="item-details">
-                                        <span class="item-name">${item.name || 'صنف'}</span>
-                                        <div class="item-price-info">
-                                            <span class="item-unit-price">${price.toFixed(2)} د.أ</span>
-                                            <span class="item-separator">|</span>
-                                            <span class="item-quantity">x${qty}</span>
-                                        </div>
+                            return `<div class="order-item">
+                                <div class="item-details">
+                                    <span class="item-name">${item.name || 'صنف'}</span>
+                                    <div class="item-price-info">
+                                        <span class="item-unit-price">${price.toFixed(2)} د.أ</span>
+                                        <span class="item-separator">|</span>
+                                        <span class="item-quantity">x${qty}</span>
                                     </div>
-                                    <span class="item-total">${itemTotal} د.أ</span>
-                                </div>`;
+                                </div>
+                                <span class="item-total">${itemTotal} د.أ</span>
+                            </div>`;
                         }).join('')}
                         <div class="order-total">
                             <span>المجموع</span>
@@ -1115,6 +1412,7 @@
                         </div>
                     </div>
                     ${order.notes ? `<div class="order-notes"><i class="fas fa-sticky-note"></i> ${order.notes}</div>` : ''}
+                    ${transferNoticesHTML}
                     ${modificationsHTML}
                     ${statusBadgeHTML}
                 </div>
@@ -1122,6 +1420,9 @@
                     ${order.status === 'preparing' ? `
                         <button class="action-btn btn-done" data-action="complete" data-order-id="${order.orderId}">
                             <i class="fas fa-check"></i> تم التحضير
+                        </button>
+                        <button class="action-btn btn-transfer" data-action="transfer" data-order-id="${order.orderId}" data-table="${order.tableNumber}">
+                            <i class="fas fa-exchange-alt"></i> نقل الطاولة
                         </button>
                     ` : ''}
                     <button class="action-btn btn-print" data-action="print" data-order-id="${order.orderId}">
@@ -1160,8 +1461,7 @@
             const empty = DOM.ordersContainer.querySelector('.empty-state');
             if (visible === 0 && KitchenState.orderElements.size > 0) {
                 if (!empty) {
-                    const div = document.createElement('div');
-                    div.className = 'empty-state';
+                    const div = document.createElement('div'); div.className = 'empty-state';
                     div.innerHTML = `<i class="fas fa-utensils"></i><h3>لا توجد طلبات ${status === 'preparing' ? 'قيد التحضير' : 'مكتملة'}</h3><p>سيتم عرض الطلبات هنا</p>`;
                     DOM.ordersContainer.appendChild(div);
                 }
@@ -1197,13 +1497,11 @@
             if (!KitchenState.active || KitchenState.isLoading) return;
             KitchenState.isLoading = true;
             DOM.refreshBtn.innerHTML = '<i class="fas fa-spinner spinner"></i>';
-
             let lastSync = 0;
             if (KitchenState.orders.length > 0) {
                 const timestamps = KitchenState.orders.map(o => new Date(o.timestamp).getTime());
                 lastSync = Math.max(...timestamps);
             }
-
             try {
                 const url = `${CONFIG.API_URL}?action=getOrders&lastSync=${lastSync}&_=${Date.now()}`;
                 await fetchWithTimeout(url, { timeout: CONFIG.FETCH_TIMEOUT });
@@ -1232,16 +1530,17 @@
                 if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
                 if (data.success && data.orders) {
-                    // ======== دمج بيانات API مع الطلبات المحلية المحدَّثة ========
-                    // الطلبات المكتملة في الذاكرة تحمل الأصناف الصحيحة بعد التعديل
-                    // لا نسمح لـ API بالكتابة فوقها بالأصناف القديمة
                     const localCompletedMap = {};
-                    KitchenState.orders.forEach(o => {
-                        if (o.status === 'completed') localCompletedMap[o.orderId] = o;
-                    });
+                    KitchenState.orders.forEach(o => { if (o.status === 'completed') localCompletedMap[o.orderId] = o; });
+                    // الحفاظ على أرقام الطاولات بعد النقل
+                    const localTableMap = {};
+                    KitchenState.orders.forEach(o => { localTableMap[o.orderId] = o.tableNumber; });
                     const mergedOrders = data.orders.map(apiOrder => {
-                        const localCompleted = localCompletedMap[apiOrder.orderId || apiOrder.id];
-                        if (localCompleted) return localCompleted; // الاحتفاظ بالنسخة المحلية الصحيحة
+                        const oid = apiOrder.orderId || apiOrder.id;
+                        const localCompleted = localCompletedMap[oid];
+                        if (localCompleted) return localCompleted;
+                        // إذا كان الطلب قد تم نقل طاولته محلياً، نحافظ على رقم الطاولة الجديد
+                        if (localTableMap[oid]) apiOrder.tableNumber = localTableMap[oid];
                         return apiOrder;
                     });
                     await processOrders(mergedOrders);
@@ -1270,8 +1569,7 @@
             DOM.popupTableNumber.textContent = order.tableNumber || '?';
             let timeStr = '-';
             if (order.timestamp) {
-                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); }
-                catch(e) {}
+                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); } catch(e) {}
             }
             DOM.popupTime.textContent = timeStr;
             DOM.popupTotal.textContent = `${calculateOrderTotal(order).toFixed(2)} د.أ`;
@@ -1282,18 +1580,12 @@
 
         function playAlertSound() {
             if (KitchenState.soundEnabled && DOM.notificationSound) {
-                DOM.notificationSound.loop = true;
-                DOM.notificationSound.volume = 0.5;
+                DOM.notificationSound.loop = true; DOM.notificationSound.volume = 0.5;
                 DOM.notificationSound.play().catch(() => {});
             }
         }
-
         function stopAlertSound() {
-            if (DOM.notificationSound) {
-                DOM.notificationSound.pause();
-                DOM.notificationSound.currentTime = 0;
-                DOM.notificationSound.loop = false;
-            }
+            if (DOM.notificationSound) { DOM.notificationSound.pause(); DOM.notificationSound.currentTime = 0; DOM.notificationSound.loop = false; }
         }
 
         function startAlertTimer() {
@@ -1303,8 +1595,7 @@
                 const remaining = endTime - Date.now();
                 if (remaining <= 0) { DOM.timerDisplay.textContent = '00:00'; DOM.progressFill.style.width = '100%'; return; }
                 const seconds = Math.floor(remaining / 1000);
-                const mins = Math.floor(seconds / 60);
-                const secs = seconds % 60;
+                const mins = Math.floor(seconds / 60); const secs = seconds % 60;
                 DOM.timerDisplay.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
                 DOM.progressFill.style.width = `${((60000 - remaining) / 60000) * 100}%`;
             }, 100);
@@ -1314,10 +1605,157 @@
             stopAlertSound();
             if (KitchenState.timerInterval) { clearInterval(KitchenState.timerInterval); KitchenState.timerInterval = null; }
             DOM.popupOverlay.classList.remove('active');
-            KitchenState.popupActive = false;
-            KitchenState.currentAlertOrder = null;
-            DOM.timerDisplay.textContent = '01:00';
-            DOM.progressFill.style.width = '0%';
+            KitchenState.popupActive = false; KitchenState.currentAlertOrder = null;
+            DOM.timerDisplay.textContent = '01:00'; DOM.progressFill.style.width = '0%';
+        }
+
+        // ======================== نقل الطاولة ========================
+        window.openTransferPopup = function(orderId, fromTable) {
+            KitchenState.transferOrderId = orderId;
+            KitchenState.transferFromTable = String(fromTable);
+            KitchenState.transferToTable = null;
+
+            DOM.transferFromNum.textContent = fromTable;
+            DOM.transferToPreview.textContent = '-';
+            DOM.transferTableInput.value = '';
+            DOM.confirmTransferBtn.disabled = true;
+
+            buildQuickTablesGrid(String(fromTable));
+
+            KitchenState.transferPopupActive = true;
+            DOM.transferPopupOverlay.classList.add('active');
+        };
+
+        function buildQuickTablesGrid(fromTable) {
+            const statuses = loadTableStatuses();
+            DOM.quickTablesGrid.innerHTML = '';
+            for (let i = 1; i <= CONFIG.TABLE_COUNT; i++) {
+                const btn = document.createElement('button');
+                btn.className = 'quick-table-btn';
+                btn.textContent = i;
+                btn.dataset.tableNum = i;
+
+                const st = statuses[String(i)] || 'free';
+                if (String(i) === String(fromTable)) {
+                    btn.classList.add('disabled-table');
+                    btn.title = 'الطاولة الحالية';
+                } else if (st === 'occupied' || st === 'billed') {
+                    btn.classList.add('occupied');
+                    btn.title = 'مشغولة';
+                }
+
+                btn.addEventListener('click', () => {
+                    if (btn.classList.contains('disabled-table')) return;
+                    DOM.quickTablesGrid.querySelectorAll('.quick-table-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    DOM.transferTableInput.value = i;
+                    selectTransferTarget(i);
+                });
+                DOM.quickTablesGrid.appendChild(btn);
+            }
+        }
+
+        function selectTransferTarget(num) {
+            const n = parseInt(num);
+            if (!n || n < 1 || n > CONFIG.TABLE_COUNT || String(n) === KitchenState.transferFromTable) {
+                KitchenState.transferToTable = null;
+                DOM.transferToPreview.textContent = '-';
+                DOM.confirmTransferBtn.disabled = true;
+                return;
+            }
+            KitchenState.transferToTable = String(n);
+            DOM.transferToPreview.textContent = n;
+            DOM.confirmTransferBtn.disabled = false;
+        }
+
+        function closeTransferPopup() {
+            DOM.transferPopupOverlay.classList.remove('active');
+            KitchenState.transferPopupActive = false;
+            KitchenState.transferOrderId = null;
+            KitchenState.transferFromTable = null;
+            KitchenState.transferToTable = null;
+        }
+
+        async function confirmTableTransfer() {
+            const orderId = KitchenState.transferOrderId;
+            const fromTable = KitchenState.transferFromTable;
+            const toTable = KitchenState.transferToTable;
+            if (!orderId || !fromTable || !toTable) return;
+
+            const order = KitchenState.orders.find(o => o.orderId === orderId);
+            if (!order) { showNotification('❌ لم يتم العثور على الطلب', 'error'); closeTransferPopup(); return; }
+
+            // 1. تسجيل عملية النقل في سجل الطلب (يظهر على البطاقة بشكل دائم)
+            addTransferLog(orderId, fromTable, toTable);
+
+            // 2. تحديث رقم الطاولة في الطلب
+            order.tableNumber = toTable;
+
+            // 3. تحديث حالات الطاولات
+            setTableStatus(fromTable, 'free');
+            setTableStatus(toTable, 'occupied');
+
+            // 4. إرسال BroadcastChannel
+            if (window.BroadcastChannel) {
+                const bc = new BroadcastChannel('table_status_channel');
+                bc.postMessage({
+                    type: 'TABLE_TRANSFER',
+                    fromTable: fromTable,
+                    toTable: toTable,
+                    orderId: orderId,
+                    transferredAt: new Date().toISOString()
+                });
+                bc.close();
+            }
+
+            // 5. تحديث بطاقة الطلب في الشاشة (رقم الطاولة الجديد + تنبيه النقل)
+            const card = KitchenState.orderElements.get(orderId);
+            if (card) {
+                card.dataset.table = toTable;
+                fillCardContent(card, order);
+                sortCardsByTime();
+                filterCardsByStatus(KitchenState.currentStatus);
+            }
+
+            // 6. حفظ في IndexedDB
+            try { await DB.putOrders([order]); } catch(e) { saveToLocalStorage(KitchenState.orders); }
+
+            // 7. إرسال للـ API (best-effort)
+            try {
+                const formData = new URLSearchParams();
+                formData.append('action', 'transferTable');
+                formData.append('orderId', orderId);
+                formData.append('fromTable', fromTable);
+                formData.append('toTable', toTable);
+                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
+            } catch(e) {}
+
+            closeTransferPopup();
+            showNotification(`✅ تم نقل الطاولة ${fromTable} ← ${toTable} بنجاح`, 'transfer');
+        }
+
+        // ======================== تحرير جميع الطاولات ========================
+        function openFreeAllPopup() {
+            KitchenState.freeAllPopupActive = true;
+            DOM.freeAllPopupOverlay.classList.add('active');
+        }
+
+        function closeFreeAllPopup() {
+            DOM.freeAllPopupOverlay.classList.remove('active');
+            KitchenState.freeAllPopupActive = false;
+        }
+
+        function confirmFreeAllTables() {
+            // مسح جميع حالات الطاولات
+            saveTableStatuses({});
+            // إرسال BroadcastChannel لتحديث الشاشات الأخرى
+            if (window.BroadcastChannel) {
+                const bc = new BroadcastChannel('table_status_channel');
+                bc.postMessage({ type: 'TABLE_STATUS_UPDATE', statuses: {} });
+                bc.close();
+            }
+            closeFreeAllPopup();
+            showNotification('✅ تم تحرير جميع الطاولات بنجاح', 'success');
         }
 
         // ======================== Event Delegation ========================
@@ -1330,42 +1768,30 @@
             else if (action === 'print') window.printOrder(orderId);
             else if (action === 'delete') window.deleteOrder(orderId);
             else if (action === 'freeTable') window.freeTable(btn.dataset.table, orderId);
+            else if (action === 'transfer') window.openTransferPopup(orderId, btn.dataset.table);
         });
 
         window.completeOrder = async function(orderId) {
             const order = KitchenState.orders.find(o => o.orderId === orderId);
             if (!order) return;
             const now = new Date().toISOString();
-
-            // ======== خطوة 1: تطبيق الأصناف المعدَّلة على الطلب قبل أي شيء آخر ========
-            // هذا يضمن أن الطلب يحمل الأصناف الصحيحة (المُعدَّلة) عند نقله للمكتملة
             const modData = KitchenState.modifiedOrders[orderId];
             if (modData) {
-                if (modData.newItems && modData.newItems.length > 0) {
-                    order.items = modData.newItems.map(i => ({ ...i }));
-                }
+                if (modData.newItems && modData.newItems.length > 0) order.items = modData.newItems.map(i => ({ ...i }));
                 if (modData.newTotal) order.total = String(modData.newTotal);
                 if (modData.newNotes !== undefined) order.notes = modData.newNotes;
             }
-
-            order.status = 'completed';
-            order.completedAt = now;
-
-            // ======== خطوة 2: الآن نمسح بيانات التعديل (بعد تطبيقها) ========
+            order.status = 'completed'; order.completedAt = now;
             removeModifiedOrder(orderId);
-
             updateStats();
             const card = KitchenState.orderElements.get(orderId);
             if (card) {
                 card.classList.remove('modified');
                 updateCardContent(card, order);
-                card.dataset.status = 'completed';
-                card.dataset.completedAt = now;
-                sortCardsByTime();
-                filterCardsByStatus(KitchenState.currentStatus);
+                card.dataset.status = 'completed'; card.dataset.completedAt = now;
+                sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus);
             }
             setTableStatus(order.tableNumber, 'free');
-            // ======== خطوة 3: حفظ الطلب بأصنافه المحدَّثة في DB ========
             try { await DB.putOrders([order]); } catch(e) { saveToLocalStorage(KitchenState.orders); }
             updateOrderStatus(orderId, 'completed');
             showNotification('✅ تم إكمال الطلب - الطاولة أصبحت حرة', 'success');
@@ -1375,23 +1801,21 @@
             if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
             KitchenState.orders = KitchenState.orders.filter(o => o.orderId !== orderId);
             KitchenState.lastOrderIds.delete(orderId);
-            // ======== مسح بيانات التعديل عند الحذف ========
             removeModifiedOrder(orderId);
             const card = KitchenState.orderElements.get(orderId);
             if (card) { card.remove(); KitchenState.orderElements.delete(orderId); }
-            updateStats();
-            filterCardsByStatus(KitchenState.currentStatus);
+            updateStats(); filterCardsByStatus(KitchenState.currentStatus);
             if (KitchenState.orderElements.size === 0) showEmptyState();
             try { await DB.deleteOrder(orderId); } catch(e) {}
             try {
                 const formData = new URLSearchParams();
-                formData.append('action', 'deleteOrder');
-                formData.append('orderId', orderId);
+                formData.append('action', 'deleteOrder'); formData.append('orderId', orderId);
                 fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
                 showNotification('🗑️ تم حذف الطلب', 'success');
             } catch(error) { showNotification('⚠️ تم الحذف محلياً', 'error'); }
         };
 
+        // ======================== وظيفة الطباعة المعدلة (بدون سجل نقل الطاولة وبدون ملاحظات) ========================
         window.printOrder = function(orderId) {
             const order = KitchenState.orders.find(o => o.orderId === orderId);
             if (!order) return;
@@ -1399,63 +1823,34 @@
             const tableNumber = order.tableNumber || '?';
             const total = calculateOrderTotal(order).toFixed(2);
             let timeStr = '-';
-            if (order.timestamp) {
-                try { timeStr = new Date(order.timestamp).toLocaleString('ar-EG'); } catch(e) {}
-            }
-            // ======== الطباعة تُحوّل الطاولة إلى "billed" فقط إذا كان الطلب لا يزال قيد التحضير ========
-            // الطلبات المكتملة: الطاولة تبقى free (لأنها حُرِّرت عند الإكمال)
-            if (order.status === 'preparing') {
-                setTableStatus(tableNumber, 'billed');
-            }
+            if (order.timestamp) { try { timeStr = new Date(order.timestamp).toLocaleString('ar-EG'); } catch(e) {} }
+            if (order.status === 'preparing') setTableStatus(tableNumber, 'billed');
+
+            // تم إزالة سجل نقل الطاولة والملاحظات بالكامل من الفاتورة
+
             showNotification(`🖨️ طباعة فاتورة الطاولة ${tableNumber}`, 'info');
             const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <!DOCTYPE html><html dir="rtl">
-                <head><meta charset="UTF-8"><title>فاتورة ${order.orderId}</title>
-                <style>body{font-family:'Cairo',sans-serif;padding:20px}.invoice{max-width:400px;margin:0 auto;border:2px solid #2D5A27;padding:20px;border-radius:20px}.header{text-align:center;margin-bottom:20px}h1{color:#2D5A27}.info{background:#F5E6D3;padding:10px;border-radius:10px;margin:10px 0}.table-number{font-size:2em;font-weight:900;color:#2D5A27;text-align:center}table{width:100%;border-collapse:collapse;margin:15px 0}th{background:#2D5A27;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}.total{font-size:1.5em;font-weight:900;color:#2D5A27;text-align:left;margin-top:15px}.footer{text-align:center;margin-top:20px;color:#666}</style>
-                </head><body>
-                <div class="invoice">
-                    <div class="header"><h1>🌲 تل السنديان</h1><p>Tel AlSindian</p></div>
-                    <div class="table-number">🪑 طاولة رقم: ${tableNumber}</div>
-                    <div class="info"><p><strong>رقم الطلب:</strong> ${order.orderId}</p><p><strong>الوقت:</strong> ${timeStr}</p></div>
-                    <table><tr><th>الصنف</th><th>سعر الوحدة</th><th>الكمية</th><th>الإجمالي</th></tr>
-                    ${items.map(item => {const p=extractNumber(item.price);const q=extractNumber(item.quantity);return`<tr><td>${item.name||'صنف'}</td><td>${p.toFixed(2)} د.أ</td><td>${q}</td><td>${(p*q).toFixed(2)} د.أ</td></tr>`;}).join('')}
-                    </table>
-                    <div class="total">المجموع: ${total} د.أ</div>
-                    ${order.notes?`<div class="info"><strong>ملاحظات:</strong> ${order.notes}</div>`:''}
-                    <div class="footer"><p>شكراً لثقتكم 🌲</p><p>نتمنى لكم وجبة شهية</p></div>
-                </div></body></html>`);
+            printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>فاتورة ${order.orderId}</title><style>body{font-family:'Cairo',sans-serif;padding:20px}.invoice{max-width:400px;margin:0 auto;border:2px solid #2D5A27;padding:20px;border-radius:20px}.header{text-align:center;margin-bottom:20px}h1{color:#2D5A27}.info{background:#F5E6D3;padding:10px;border-radius:10px;margin:10px 0}.table-number{font-size:2em;font-weight:900;color:#2D5A27;text-align:center}table{width:100%;border-collapse:collapse;margin:15px 0}th{background:#2D5A27;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}.total{font-size:1.5em;font-weight:900;color:#2D5A27;text-align:left;margin-top:15px}.footer{text-align:center;margin-top:20px;color:#666}</style></head><body><div class="invoice"><div class="header"><h1>🌲 تل السنديان</h1><p>Tel AlSindian</p></div><div class="table-number">🪑 طاولة رقم: ${tableNumber}</div><div class="info"><p><strong>رقم الطلب:</strong> ${order.orderId}</p><p><strong>الوقت:</strong> ${timeStr}</p></div><table><th>الصنف</th><th>سعر الوحدة</th><th>الكمية</th><th>الإجمالي</th></tr>${items.map(item=>{const p=extractNumber(item.price);const q=extractNumber(item.quantity);return`<tr><td>${item.name||'صنف'}</td><td>${p.toFixed(2)} د.أ</td><td>${q}</td><td>${(p*q).toFixed(2)} د.أ</td></tr>`;}).join('')}</table><div class="total">المجموع: ${total} د.أ</div><div class="footer"><p>شكراً لثقتكم 🌲</p><p>نتمنى لكم وجبة شهية</p></div></div></body></html>`);
             printWindow.document.close();
             setTimeout(() => printWindow.print(), 500);
         };
 
-        // ======== تحرير الطاولة يدوياً من بطاقة المكتملة ========
         window.freeTable = function(tableNumber, orderId) {
             if (!tableNumber) return;
             const currentStatus = loadTableStatuses()[tableNumber] || 'free';
-            if (currentStatus === 'free') {
-                showNotification(`🪑 الطاولة ${tableNumber} متاحة بالفعل`, 'info');
-                return;
-            }
+            if (currentStatus === 'free') { showNotification(`🪑 الطاولة ${tableNumber} متاحة بالفعل`, 'info'); return; }
             setTableStatus(tableNumber, 'free');
             showNotification(`✅ تم تحرير الطاولة ${tableNumber}`, 'success');
-            // تحديث مظهر الزر ليعكس الحالة الجديدة
             const card = KitchenState.orderElements.get(orderId);
             if (card) {
                 const freeBtn = card.querySelector('[data-action="freeTable"]');
-                if (freeBtn) {
-                    freeBtn.innerHTML = '<i class="fas fa-check-circle"></i> الطاولة حرة';
-                    freeBtn.disabled = true;
-                    freeBtn.style.opacity = '0.5';
-                    freeBtn.style.cursor = 'default';
-                }
+                if (freeBtn) { freeBtn.innerHTML = '<i class="fas fa-check-circle"></i> الطاولة حرة'; freeBtn.disabled = true; freeBtn.style.opacity = '0.5'; freeBtn.style.cursor = 'default'; }
             }
         };
 
         async function initializeApp() {
-            // ======== تحميل التعديلات المحفوظة أولاً ========
             KitchenState.modifiedOrders = loadModifiedOrdersFromStorage();
-
+            KitchenState.transferLogs = loadTransferLogs();
             try {
                 await DB.init();
                 const orders = await DB.getAllOrders();
@@ -1489,12 +1884,12 @@
         function handleOffline() { KitchenState.online = false; showNotification('⚠️ انقطع الاتصال، يتم عرض الطلبات المخزنة', 'error'); }
 
         function showNotification(message, type = 'info') {
-            const colors = { success: '#2D5A27', error: '#8B5A2B', modify: '#b85400', info: '#4A7B3D' };
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', modify: 'fa-pencil-alt', info: 'fa-info-circle' };
-            const n = document.createElement('div');
-            n.className = 'notification';
+            const colors = { success: '#2D5A27', error: '#8B5A2B', modify: '#b85400', info: '#4A7B3D', transfer: '#1565C0' };
+            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', modify: 'fa-pencil-alt', info: 'fa-info-circle', transfer: 'fa-exchange-alt' };
+            const n = document.createElement('div'); n.className = 'notification';
             n.style.background = colors[type] || colors.info;
             if (type === 'modify') { n.style.border = '2px solid rgba(255,200,80,0.7)'; n.style.boxShadow = '0 8px 25px rgba(255,140,0,0.45)'; }
+            if (type === 'transfer') { n.style.border = '2px solid rgba(100,180,255,0.5)'; n.style.boxShadow = '0 8px 25px rgba(21,101,192,0.45)'; }
             n.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
             document.body.appendChild(n);
             setTimeout(() => n.remove(), 3500);
@@ -1504,28 +1899,23 @@
         function showModifyOrderPopup(data) {
             if (!KitchenState.active || KitchenState.modifyPopupActive) return;
             KitchenState.modifyPopupActive = true;
-
             DOM.modifyPopupOrderId.textContent    = data.orderId || `طاولة ${data.tableNumber}`;
             DOM.modifyPopupTableNumber.textContent = data.tableNumber || '?';
             DOM.modifyPopupTotal.textContent      = `${parseFloat(data.total || 0).toFixed(2)} د.أ`;
             const timeStr = new Date(data.modifiedAt || Date.now()).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' });
             DOM.modifyPopupTime.textContent = timeStr;
-
             const newItems = Array.isArray(data.items) ? data.items : [];
             let previewHTML = `<div class="preview-title"><i class="fas fa-list"></i> تفاصيل الطلب المحدّث</div>`;
             if (newItems.length === 0) {
                 previewHTML += `<div class="preview-item"><span class="p-name" style="color:#999">لا توجد أصناف</span></div>`;
             } else {
                 newItems.forEach(item => {
-                    const price = parseFloat(item.price || 0);
-                    const qty   = parseInt(item.quantity || 1);
+                    const price = parseFloat(item.price || 0); const qty = parseInt(item.quantity || 1);
                     previewHTML += `<div class="preview-item"><span class="p-name">${item.name || 'صنف'}</span><span class="p-qty">×${qty}</span><span class="p-price">${(price * qty).toFixed(2)} د.أ</span></div>`;
                 });
             }
             if (data.notes) previewHTML += `<div class="modify-notes-preview"><i class="fas fa-sticky-note"></i> ${data.notes}</div>`;
             DOM.modifyItemsPreview.innerHTML = previewHTML;
-
-            // البحث عن الطلب المستهدف
             let targetOrder = null;
             if (data.orderId && data.orderId !== 'null' && data.orderId !== '') {
                 targetOrder = KitchenState.orders.find(o => o.orderId === data.orderId);
@@ -1538,47 +1928,22 @@
                     targetOrder = tableOrders[0];
                 }
             }
-
             if (targetOrder) {
-                // ===== حساب الفروقات =====
                 const oldItems = targetOrder.items ? targetOrder.items.map(i => ({ ...i })) : [];
                 const diff = computeDiff(oldItems, newItems);
-
-                // تحديث بيانات الطلب في الذاكرة
                 if (newItems.length > 0) targetOrder.items = newItems.map(i => ({ ...i }));
                 if (data.total) targetOrder.total = String(data.total);
                 if (data.notes !== undefined) targetOrder.notes = data.notes;
-
-                // ======== حفظ التعديل في localStorage بشكل دائم ========
-                addModifiedOrder(targetOrder.orderId, {
-                    diff,
-                    modifiedAt: data.modifiedAt,
-                    newItems: newItems.map(i => ({ ...i })),
-                    newTotal: data.total,
-                    newNotes: data.notes
-                });
-
+                addModifiedOrder(targetOrder.orderId, { diff, modifiedAt: data.modifiedAt, newItems: newItems.map(i => ({ ...i })), newTotal: data.total, newNotes: data.notes });
                 DOM.modifyPopupOverlay.dataset.targetOrderId = targetOrder.orderId;
                 DOM.modifyPopupOverlay.dataset.scrollToId   = targetOrder.orderId;
-
-                // تحديث البطاقة فوراً
                 const card = KitchenState.orderElements.get(targetOrder.orderId);
-                if (card) {
-                    card.classList.add('modified');
-                    card.dataset.status = targetOrder.status;
-                    fillCardContent(card, targetOrder);
-                    filterCardsByStatus(KitchenState.currentStatus);
-                }
-
-                // ======== تحديث IndexedDB بالبيانات الجديدة ========
-                DB.putOrders([targetOrder]).catch(() => {
-                    saveToLocalStorage(KitchenState.orders);
-                });
+                if (card) { card.classList.add('modified'); card.dataset.status = targetOrder.status; fillCardContent(card, targetOrder); filterCardsByStatus(KitchenState.currentStatus); }
+                DB.putOrders([targetOrder]).catch(() => { saveToLocalStorage(KitchenState.orders); });
             } else {
                 DOM.modifyPopupOverlay.dataset.targetOrderId = '';
                 DOM.modifyPopupOverlay.dataset.scrollToId   = '';
             }
-
             playModifySound();
             DOM.modifyPopupOverlay.classList.add('active');
         }
@@ -1587,28 +1952,18 @@
             stopModifySound();
             DOM.modifyPopupOverlay.classList.remove('active');
             KitchenState.modifyPopupActive = false;
-
             const scrollToId = DOM.modifyPopupOverlay.dataset.scrollToId;
-
             if (KitchenState.currentStatus !== 'preparing') {
-                DOM.tabs.forEach(t => {
-                    t.classList.remove('active');
-                    if (t.dataset.status === 'preparing') t.classList.add('active');
-                });
+                DOM.tabs.forEach(t => { t.classList.remove('active'); if (t.dataset.status === 'preparing') t.classList.add('active'); });
                 KitchenState.currentStatus = 'preparing';
             }
             filterCardsByStatus('preparing');
-
             if (scrollToId) {
                 setTimeout(() => {
                     const card = KitchenState.orderElements.get(scrollToId);
-                    if (card) {
-                        card.classList.remove('hidden-by-tab');
-                        card.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    if (card) { card.classList.remove('hidden-by-tab'); card.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
                 }, 300);
             }
-
             DOM.modifyPopupOverlay.dataset.targetOrderId = '';
             DOM.modifyPopupOverlay.dataset.scrollToId   = '';
         }
@@ -1618,7 +1973,6 @@
             DOM.modifySound.loop = true; DOM.modifySound.volume = 0.45;
             DOM.modifySound.play().catch(() => {});
         }
-
         function stopModifySound() {
             if (!DOM.modifySound) return;
             DOM.modifySound.pause(); DOM.modifySound.currentTime = 0; DOM.modifySound.loop = false;
@@ -1637,9 +1991,7 @@
                     showNotification(`✏️ تعديل على طاولة ${event.data.tableNumber}`, 'modify');
                     showModifyOrderPopup(event.data);
                 }
-                // ======== عند إكمال الطلب من جهة أخرى - مسح التعديلات ========
                 if (event.data.type === 'ORDER_COMPLETED') {
-                    const t = event.data.tableNumber;
                     const oid = event.data.orderId;
                     if (oid) removeModifiedOrder(oid);
                 }
@@ -1648,10 +2000,8 @@
 
         // ======================== ربط الأحداث ========================
         DOM.activateBtn.addEventListener('click', async () => {
-            KitchenState.active = true;
-            KitchenState.initialLoad = true;
-            DOM.startup.classList.add('hidden');
-            DOM.mainContent.style.opacity = '1';
+            KitchenState.active = true; KitchenState.initialLoad = true;
+            DOM.startup.classList.add('hidden'); DOM.mainContent.style.opacity = '1';
             playTestSound();
             await initializeApp();
             window.addEventListener('online', handleOnline);
@@ -1666,6 +2016,9 @@
         });
 
         DOM.refreshBtn.addEventListener('click', () => { loadOrdersWithRetry(); showNotification('🔄 جاري تحديث الطلبات', 'info'); });
+
+        // ===== زر تحرير جميع الطاولات =====
+        DOM.freeAllTablesBtn.addEventListener('click', openFreeAllPopup);
 
         DOM.tabs.forEach(tab => {
             tab.addEventListener('click', () => {
@@ -1684,10 +2037,7 @@
             if (order) {
                 updateStats();
                 const card = KitchenState.orderElements.get(orderId);
-                if (card) {
-                    updateCardContent(card, order); card.dataset.status = 'preparing';
-                    delete card.dataset.completedAt; sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus);
-                }
+                if (card) { updateCardContent(card, order); card.dataset.status = 'preparing'; delete card.dataset.completedAt; sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus); }
                 DB.putOrders([order]).catch(() => {});
             }
             showNotification('✅ تم استلام الطلب', 'success');
@@ -1698,6 +2048,28 @@
         DOM.closeModifyPopupBtn.addEventListener('click', closeModifyPopup);
         DOM.acknowledgeModifyBtn.addEventListener('click', closeModifyPopup);
         DOM.modifyPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.modifyPopupOverlay) closeModifyPopup(); });
+
+        // أحداث بوبأب نقل الطاولة
+        DOM.closeTransferPopupBtn.addEventListener('click', closeTransferPopup);
+        DOM.cancelTransferBtn.addEventListener('click', closeTransferPopup);
+        DOM.transferPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.transferPopupOverlay) closeTransferPopup(); });
+        DOM.confirmTransferBtn.addEventListener('click', confirmTableTransfer);
+
+        DOM.transferTableInput.addEventListener('input', () => {
+            const val = parseInt(DOM.transferTableInput.value);
+            DOM.quickTablesGrid.querySelectorAll('.quick-table-btn').forEach(b => {
+                b.classList.remove('selected');
+                if (parseInt(b.dataset.tableNum) === val) b.classList.add('selected');
+            });
+            selectTransferTarget(val);
+        });
+
+        // أحداث بوبأب تحرير جميع الطاولات
+        DOM.closeFreeAllPopupBtn.addEventListener('click', closeFreeAllPopup);
+        DOM.cancelFreeAllBtn.addEventListener('click', closeFreeAllPopup);
+        DOM.confirmFreeAllBtn.addEventListener('click', confirmFreeAllTables);
+        DOM.freeAllPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.freeAllPopupOverlay) closeFreeAllPopup(); });
+
         window.addEventListener('storage', (e) => { if (e.key === CONFIG.CACHE_KEY && KitchenState.active) loadFromLocalStorage(); });
     </script>
 </body>
