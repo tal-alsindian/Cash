@@ -728,7 +728,7 @@
         <div id="ordersContainer" class="orders-grid"></div>
     </div>
 
-    <!-- Popup طلب جديد -->
+    <!-- POPUPS (نفس الأصلي بالكامل) -->
     <div id="popupOverlay" class="popup-overlay">
         <div class="order-popup">
             <div class="popup-header">
@@ -779,7 +779,6 @@
         </div>
     </div>
 
-    <!-- Popup تعديل الطلب -->
     <div id="modifyPopupOverlay" class="popup-overlay modify-popup-overlay">
         <div class="order-popup modify-popup">
             <div class="popup-header modify-header">
@@ -822,7 +821,6 @@
         </div>
     </div>
 
-    <!-- Popup نقل الطاولة -->
     <div id="transferPopupOverlay" class="popup-overlay transfer-popup-overlay">
         <div class="order-popup transfer-popup">
             <div class="popup-header transfer-header">
@@ -847,19 +845,15 @@
                         <div class="t-num" id="transferToPreview">-</div>
                     </div>
                 </div>
-
                 <div class="transfer-label-row">أدخل رقم الطاولة الجديدة أو اختر من القائمة:</div>
                 <div class="transfer-input-wrap">
-                    <input type="number" id="transferTableInput" class="transfer-input"
-                           min="1" max="40" placeholder="رقم الطاولة" />
+                    <input type="number" id="transferTableInput" class="transfer-input" min="1" max="40" placeholder="رقم الطاولة" />
                 </div>
-
                 <div class="quick-tables-label">
                     <i class="fas fa-th"></i> اختيار سريع
                     <span style="font-size:0.7rem;opacity:0.7;font-weight:600;margin-right:6px;">🟠 مشغولة</span>
                 </div>
                 <div class="quick-tables-grid" id="quickTablesGrid"></div>
-
                 <button id="confirmTransferBtn" class="transfer-confirm-btn" disabled>
                     <i class="fas fa-exchange-alt"></i>
                     تأكيد النقل
@@ -871,7 +865,6 @@
         </div>
     </div>
 
-    <!-- Popup تحرير جميع الطاولات -->
     <div id="freeAllPopupOverlay" class="popup-overlay free-all-popup-overlay">
         <div class="order-popup free-all-popup">
             <div class="popup-header free-all-header">
@@ -913,146 +906,75 @@
             RESTAURANT: { name: 'تل السنديان', code: 'TSN' },
             REFRESH_INTERVAL: 5000,
             MAX_REFRESH_INTERVAL: 60000,
-            CLEANUP_INTERVAL: 24 * 60 * 60 * 1000,
-            OLD_DAYS_THRESHOLD: 7,
             FETCH_TIMEOUT: 8000,
             MAX_RETRIES: 3,
-            CACHE_KEY: 'tel_alsindian_orders_backup',
-            MODIFIED_ORDERS_KEY: 'tel_alsindian_modified_orders',
-            TRANSFER_LOG_KEY: 'tel_alsindian_transfer_logs',
             TABLE_COUNT: 40,
         };
 
-        const TABLE_STATUS_KEY = 'tel_sindian_table_status';
+        // ======== حالات الطاولات — من Sheets فقط ========
+        let _tableStatuses = {};   // ذاكرة الجلسة فقط، لا تُكتب في أي مخزن دائم
 
-        function loadTableStatuses() {
-            try { return JSON.parse(localStorage.getItem(TABLE_STATUS_KEY) || '{}'); }
-            catch(e) { return {}; }
-        }
-
-        function saveTableStatuses(statuses) {
+        async function fetchTableStatusesFromSheets() {
             try {
-                localStorage.setItem(TABLE_STATUS_KEY, JSON.stringify(statuses));
-                if (window.BroadcastChannel) {
-                    const bc = new BroadcastChannel('table_status_channel');
-                    bc.postMessage({ type: 'TABLE_STATUS_UPDATE', statuses });
-                    bc.close();
+                const r = await fetch(`${CONFIG.API_URL}?action=getTableStatuses&_=${Date.now()}`);
+                const d = await r.json();
+                if (d.success && d.statuses) {
+                    _tableStatuses = d.statuses;
                 }
-            } catch(e) {}
+            } catch(e) {
+                console.warn('fetchTableStatusesFromSheets failed:', e);
+            }
         }
 
-        function setTableStatus(tableNum, status) {
-            const statuses = loadTableStatuses();
-            statuses[tableNum] = status;
-            saveTableStatuses(statuses);
+        async function pushTableStatusToSheets(tableNum, status) {
+            const fd = new URLSearchParams();
+            fd.append('action', 'setTableStatus');
+            fd.append('tableNumber', String(tableNum));
+            fd.append('status', status);
+            try {
+                await fetch(CONFIG.API_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: fd
+                });
+                _tableStatuses[String(tableNum)] = status;
+            } catch(e) {
+                console.warn('pushTableStatusToSheets failed:', e);
+            }
+        }
+
+        async function pushAllTableStatusesToSheets(statuses) {
+            const fd = new URLSearchParams();
+            fd.append('action', 'setAllTableStatuses');
+            fd.append('statuses', JSON.stringify(statuses));
+            try {
+                await fetch(CONFIG.API_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: fd
+                });
+                _tableStatuses = { ...statuses };
+            } catch(e) {
+                console.warn('pushAllTableStatusesToSheets failed:', e);
+            }
         }
 
         function getTableStatus(tableNum) {
-            const statuses = loadTableStatuses();
-            return statuses[String(tableNum)] || statuses[tableNum] || 'free';
+            return _tableStatuses[String(tableNum)] || 'free';
         }
 
-        function loadTransferLogs() {
-            try { return JSON.parse(localStorage.getItem(CONFIG.TRANSFER_LOG_KEY) || '{}'); }
-            catch(e) { return {}; }
-        }
-        function saveTransferLogs(logs) {
-            try { localStorage.setItem(CONFIG.TRANSFER_LOG_KEY, JSON.stringify(logs)); } catch(e) {}
-        }
+        // ======== Transfer Logs — ذاكرة الجلسة فقط ========
+        const _transferLogs = {};
         function addTransferLog(orderId, fromTable, toTable) {
-            const logs = loadTransferLogs();
-            if (!logs[orderId]) logs[orderId] = [];
-            logs[orderId].push({
-                from: String(fromTable),
-                to: String(toTable),
-                at: new Date().toISOString()
-            });
-            saveTransferLogs(logs);
-            if (!KitchenState.transferLogs[orderId]) KitchenState.transferLogs[orderId] = [];
-            KitchenState.transferLogs[orderId].push({ from: String(fromTable), to: String(toTable), at: new Date().toISOString() });
+            if (!_transferLogs[orderId]) _transferLogs[orderId] = [];
+            _transferLogs[orderId].push({ from: String(fromTable), to: String(toTable), at: new Date().toISOString() });
         }
-        function getTransferLogs(orderId) {
-            const logs = KitchenState.transferLogs[orderId] || loadTransferLogs()[orderId];
-            return logs || [];
-        }
+        function getTransferLogs(orderId) { return _transferLogs[orderId] || []; }
 
-        function loadModifiedOrdersFromStorage() {
-            try { return JSON.parse(localStorage.getItem(CONFIG.MODIFIED_ORDERS_KEY) || '{}'); }
-            catch(e) { return {}; }
-        }
-        function saveModifiedOrdersToStorage(modifiedOrders) {
-            try { localStorage.setItem(CONFIG.MODIFIED_ORDERS_KEY, JSON.stringify(modifiedOrders)); } catch(e) {}
-        }
-        function addModifiedOrder(orderId, modData) {
-            const all = loadModifiedOrdersFromStorage();
-            all[orderId] = modData;
-            saveModifiedOrdersToStorage(all);
-            KitchenState.modifiedOrders[orderId] = modData;
-        }
-        function removeModifiedOrder(orderId) {
-            const all = loadModifiedOrdersFromStorage();
-            delete all[orderId];
-            saveModifiedOrdersToStorage(all);
-            delete KitchenState.modifiedOrders[orderId];
-        }
-
-        const DB = {
-            name: 'TelAlSindianDB', version: 1, store: 'orders', db: null,
-            async init() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(this.name, this.version);
-                    request.onerror = () => reject(request.error);
-                    request.onsuccess = () => { this.db = request.result; resolve(); };
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        if (!db.objectStoreNames.contains(this.store)) {
-                            const store = db.createObjectStore(this.store, { keyPath: 'orderId' });
-                            store.createIndex('status', 'status', { unique: false });
-                            store.createIndex('timestamp', 'timestamp', { unique: false });
-                            store.createIndex('completedAt', 'completedAt', { unique: false });
-                        }
-                    };
-                });
-            },
-            async getAllOrders() {
-                return new Promise((resolve, reject) => {
-                    const tx = this.db.transaction(this.store, 'readonly');
-                    const store = tx.objectStore(this.store);
-                    const request = store.getAll();
-                    request.onsuccess = () => resolve(request.result);
-                    request.onerror = () => reject(request.error);
-                });
-            },
-            async putOrders(orders) {
-                const tx = this.db.transaction(this.store, 'readwrite');
-                const store = tx.objectStore(this.store);
-                for (const order of orders) store.put(order);
-                return new Promise((resolve) => { tx.oncomplete = resolve; tx.onerror = resolve; });
-            },
-            async deleteOrder(orderId) {
-                const tx = this.db.transaction(this.store, 'readwrite');
-                const store = tx.objectStore(this.store);
-                store.delete(orderId);
-                return new Promise((resolve) => { tx.oncomplete = resolve; tx.onerror = resolve; });
-            },
-            async clearOldOrders(days = 7) {
-                const cutoff = new Date();
-                cutoff.setDate(cutoff.getDate() - days);
-                const tx = this.db.transaction(this.store, 'readwrite');
-                const store = tx.objectStore(this.store);
-                const index = store.index('completedAt');
-                const range = IDBKeyRange.upperBound(cutoff.toISOString());
-                const request = index.openCursor(range);
-                request.onsuccess = (event) => {
-                    const cursor = event.target.result;
-                    if (cursor) {
-                        if (cursor.value.status === 'completed') cursor.delete();
-                        cursor.continue();
-                    }
-                };
-                return new Promise((resolve) => { tx.oncomplete = resolve; tx.onerror = resolve; });
-            }
-        };
+        // ======== Modified Orders — ذاكرة الجلسة فقط ========
+        const _modifiedOrders = {};
+        function addModifiedOrder(orderId, modData) { _modifiedOrders[orderId] = modData; }
+        function removeModifiedOrder(orderId) { delete _modifiedOrders[orderId]; }
 
         const KitchenState = {
             active: false, soundEnabled: true, currentStatus: 'preparing',
@@ -1062,8 +984,6 @@
             initialLoad: true, isLoading: false, retryCount: 0,
             online: navigator.onLine, orderElements: new Map(),
             currentRefreshInterval: CONFIG.REFRESH_INTERVAL,
-            modifiedOrders: {},
-            transferLogs: {},
             transferOrderId: null,
             transferFromTable: null,
             transferToTable: null,
@@ -1167,34 +1087,22 @@
 
         function computeDiff(oldItems, newItems) {
             const result = { added: [], removed: [], changed: [] };
-            if (!oldItems || oldItems.length === 0) {
-                result.added = newItems.map(i => ({ ...i }));
-                return result;
-            }
-            const oldMap = {};
-            oldItems.forEach(item => { const key = (item.name || '').trim().toLowerCase(); oldMap[key] = { ...item }; });
-            const newMap = {};
-            newItems.forEach(item => { const key = (item.name || '').trim().toLowerCase(); newMap[key] = { ...item }; });
+            if (!oldItems || oldItems.length === 0) { result.added = newItems.map(i => ({ ...i })); return result; }
+            const oldMap = {}; oldItems.forEach(item => { oldMap[(item.name||'').trim().toLowerCase()] = { ...item }; });
+            const newMap = {}; newItems.forEach(item => { newMap[(item.name||'').trim().toLowerCase()] = { ...item }; });
             newItems.forEach(item => {
-                const key = (item.name || '').trim().toLowerCase();
+                const key = (item.name||'').trim().toLowerCase();
                 if (!oldMap[key]) { result.added.push({ ...item }); }
-                else {
-                    const oldQty = extractNumber(oldMap[key].quantity);
-                    const newQty = extractNumber(item.quantity);
-                    if (newQty !== oldQty) result.changed.push({ ...item, oldQty, newQty });
-                }
+                else { const oq = extractNumber(oldMap[key].quantity), nq = extractNumber(item.quantity); if (nq !== oq) result.changed.push({ ...item, oldQty: oq, newQty: nq }); }
             });
-            oldItems.forEach(item => {
-                const key = (item.name || '').trim().toLowerCase();
-                if (!newMap[key]) result.removed.push({ ...item });
-            });
+            oldItems.forEach(item => { const key = (item.name||'').trim().toLowerCase(); if (!newMap[key]) result.removed.push({ ...item }); });
             return result;
         }
 
         function buildModificationsHTML(diff) {
             if (!diff) return '';
-            const totalChanges = diff.added.length + diff.removed.length + diff.changed.length;
-            if (totalChanges === 0) return '';
+            const total = diff.added.length + diff.removed.length + diff.changed.length;
+            if (total === 0) return '';
             let itemsHTML = '';
             diff.added.forEach(item => {
                 const price = extractNumber(item.price); const qty = extractNumber(item.quantity);
@@ -1206,79 +1114,55 @@
             diff.removed.forEach(item => {
                 itemsHTML += `<div class="mod-removed"><div class="mod-removed-icon"><i class="fas fa-minus"></i></div><span class="mod-removed-name">${item.name||'صنف'}</span><span class="mod-removed-label">محذوف</span></div>`;
             });
-            return `<div class="new-modifications-section"><div class="new-modifications-header"><div class="new-modifications-header-icon"><i class="fas fa-pencil-alt"></i></div><span class="new-modifications-title">✨ التعديلات الجديدة</span><span class="new-modifications-count">${totalChanges} تغيير</span></div><div class="new-modifications-body">${itemsHTML}</div></div>`;
+            return `<div class="new-modifications-section"><div class="new-modifications-header"><div class="new-modifications-header-icon"><i class="fas fa-pencil-alt"></i></div><span class="new-modifications-title">✨ التعديلات الجديدة</span><span class="new-modifications-count">${total} تغيير</span></div><div class="new-modifications-body">${itemsHTML}</div></div>`;
         }
 
         function buildTransferNoticesHTML(orderId) {
             const logs = getTransferLogs(orderId);
             if (!logs || logs.length === 0) return '';
-            let html = '';
-            logs.forEach((log, idx) => {
+            return logs.map(log => {
                 const timeStr = log.at ? new Date(log.at).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }) : '-';
-                html += `
-                <div class="transfer-notice">
+                return `<div class="transfer-notice">
                     <div class="transfer-notice-header">
                         <div class="transfer-notice-icon"><i class="fas fa-exchange-alt"></i></div>
                         <span class="transfer-notice-title">🔄 تم نقل الطاولة</span>
                         <span class="transfer-notice-time">${timeStr}</span>
                     </div>
                     <div class="transfer-notice-body">
-                        <div class="transfer-notice-box from">
-                            <span class="n-label">من طاولة</span>
-                            <div class="n-num">${log.from}</div>
-                        </div>
+                        <div class="transfer-notice-box from"><span class="n-label">من طاولة</span><div class="n-num">${log.from}</div></div>
                         <div class="transfer-notice-arrow"><i class="fas fa-arrow-left"></i></div>
-                        <div class="transfer-notice-box to">
-                            <span class="n-label">إلى طاولة</span>
-                            <div class="n-num">${log.to}</div>
-                        </div>
+                        <div class="transfer-notice-box to"><span class="n-label">إلى طاولة</span><div class="n-num">${log.to}</div></div>
                     </div>
                 </div>`;
-            });
-            return html;
+            }).join('');
         }
 
-        // الإصلاح الجذري: الحفاظ على الطلبات المحلية (قيد التحضير) حتى في حال عدم ورودها من API
         async function processOrders(orders, options = {}) {
             const oldIds = new Set(KitchenState.orders.map(o => o.orderId));
             const existingOrdersMap = {};
             KitchenState.orders.forEach(o => { existingOrdersMap[o.orderId] = o; });
-            
-            // بناء خريطة الطلبات الجديدة من API
             const newOrdersMap = new Map();
             orders.forEach(o => { const norm = normalizeOrder(o); newOrdersMap.set(norm.orderId, norm); });
-            
-            // المفتاح: الاحتفاظ بكل طلب محلي حالته "preparing" حتى لو لم يرد من API (يمنع اختفاء الطلبات الحديثة)
             for (let [id, localOrder] of Object.entries(existingOrdersMap)) {
-                if (localOrder.status === 'preparing' && !newOrdersMap.has(id)) {
-                    newOrdersMap.set(id, localOrder);
-                }
+                if (localOrder.status === 'preparing' && !newOrdersMap.has(id)) newOrdersMap.set(id, localOrder);
             }
-            
             const newOrders = Array.from(newOrdersMap.values());
-            
-            // دمج بيانات المكتملة والجداول كما في السابق
             for (let newOrder of newOrders) {
                 const existing = existingOrdersMap[newOrder.orderId];
                 if (existing && existing.status === 'completed' && existing.items && existing.items.length > 0) {
-                    newOrder.items = existing.items;
-                    newOrder.total = existing.total;
-                    newOrder.notes = existing.notes;
-                    newOrder.completedAt = existing.completedAt || newOrder.completedAt;
+                    newOrder.items = existing.items; newOrder.total = existing.total;
+                    newOrder.notes = existing.notes; newOrder.completedAt = existing.completedAt || newOrder.completedAt;
                     newOrder.status = 'completed';
                     if (existing.tableNumber) newOrder.tableNumber = existing.tableNumber;
                 }
-                const modData = KitchenState.modifiedOrders[newOrder.orderId];
+                const modData = _modifiedOrders[newOrder.orderId];
                 if (modData && newOrder.status === 'preparing') {
                     if (modData.newItems && modData.newItems.length > 0) newOrder.items = modData.newItems.map(i => ({ ...i }));
                     if (modData.newTotal) newOrder.total = String(modData.newTotal);
                     if (modData.newNotes !== undefined) newOrder.notes = modData.newNotes;
                 }
-                if (existing && existing.tableNumber) {
-                    newOrder.tableNumber = existing.tableNumber;
-                }
+                if (existing && existing.tableNumber) newOrder.tableNumber = existing.tableNumber;
             }
-            
             KitchenState.orders = newOrders;
             syncOrderCards(newOrders);
             updateStats();
@@ -1288,7 +1172,6 @@
             } else {
                 KitchenState.initialLoad = false;
             }
-            try { await DB.putOrders(newOrders); } catch(e) { saveToLocalStorage(newOrders); }
         }
 
         function syncOrderCards(orders) {
@@ -1302,11 +1185,10 @@
                 }
             }
             orders.forEach(order => {
-                const isModified = !!KitchenState.modifiedOrders[order.orderId] && order.status === 'preparing';
+                const isModified = !!_modifiedOrders[order.orderId] && order.status === 'preparing';
                 const existing = KitchenState.orderElements.get(order.orderId);
                 if (existing) {
-                    if (isModified) existing.classList.add('modified');
-                    else existing.classList.remove('modified');
+                    if (isModified) existing.classList.add('modified'); else existing.classList.remove('modified');
                     updateCardContent(existing, order);
                     existing.dataset.status = order.status;
                     existing.dataset.timestamp = order.timestamp;
@@ -1338,47 +1220,31 @@
             const items = order.items || [];
             const tableNumber = order.tableNumber || '?';
             let timeStr = '-';
-            if (order.timestamp) {
-                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); } catch(e) {}
-            }
+            if (order.timestamp) { try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); } catch(e) {} }
             const displayTotal = calculateOrderTotal(order).toFixed(2);
             const modifiedBadgeHTML = isModified ? `<span class="modified-badge"><i class="fas fa-pencil-alt"></i> معدَّل</span>` : '';
             let statusBadgeHTML = '';
-            if (isModified && order.status === 'preparing') {
-                statusBadgeHTML = `<span class="status-badge status-modified"><i class="fas fa-pencil-alt"></i> معدَّل - قيد التحضير</span>`;
-            } else if (order.status === 'preparing') {
-                statusBadgeHTML = `<span class="status-badge status-preparing"><i class="fas fa-fire"></i> قيد التحضير</span>`;
-            } else {
-                statusBadgeHTML = `<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> مكتمل</span>`;
-            }
+            if (isModified && order.status === 'preparing') statusBadgeHTML = `<span class="status-badge status-modified"><i class="fas fa-pencil-alt"></i> معدَّل - قيد التحضير</span>`;
+            else if (order.status === 'preparing') statusBadgeHTML = `<span class="status-badge status-preparing"><i class="fas fa-fire"></i> قيد التحضير</span>`;
+            else statusBadgeHTML = `<span class="status-badge status-completed"><i class="fas fa-check-circle"></i> مكتمل</span>`;
             let modificationsHTML = '';
-            if (isModified && KitchenState.modifiedOrders[order.orderId]) {
-                const diff = KitchenState.modifiedOrders[order.orderId].diff;
+            if (isModified && _modifiedOrders[order.orderId]) {
+                const diff = _modifiedOrders[order.orderId].diff;
                 if (diff) modificationsHTML = buildModificationsHTML(diff);
             }
-
             const transferNoticesHTML = buildTransferNoticesHTML(order.orderId);
-
             card.innerHTML = `
                 <div class="order-header">
                     <span class="order-id">${order.orderId || 'UNKNOWN'}</span>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        ${modifiedBadgeHTML}
-                        <span class="order-time">${timeStr}</span>
-                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">${modifiedBadgeHTML}<span class="order-time">${timeStr}</span></div>
                 </div>
                 <div class="order-body">
                     <div class="table-info">
-                        <div class="table-number-large">
-                            <i class="fas fa-chair"></i>
-                            ${tableNumber}
-                        </div>
+                        <div class="table-number-large"><i class="fas fa-chair"></i>${tableNumber}</div>
                     </div>
                     <div class="order-items">
                         ${items.map(item => {
-                            const price = extractNumber(item.price);
-                            const qty = extractNumber(item.quantity);
-                            const itemTotal = (price * qty).toFixed(2);
+                            const price = extractNumber(item.price), qty = extractNumber(item.quantity);
                             return `<div class="order-item">
                                 <div class="item-details">
                                     <span class="item-name">${item.name || 'صنف'}</span>
@@ -1388,13 +1254,10 @@
                                         <span class="item-quantity">x${qty}</span>
                                     </div>
                                 </div>
-                                <span class="item-total">${itemTotal} د.أ</span>
+                                <span class="item-total">${(price*qty).toFixed(2)} د.أ</span>
                             </div>`;
                         }).join('')}
-                        <div class="order-total">
-                            <span>المجموع</span>
-                            <span>${displayTotal} د.أ</span>
-                        </div>
+                        <div class="order-total"><span>المجموع</span><span>${displayTotal} د.أ</span></div>
                     </div>
                     ${order.notes ? `<div class="order-notes"><i class="fas fa-sticky-note"></i> ${order.notes}</div>` : ''}
                     ${transferNoticesHTML}
@@ -1403,25 +1266,20 @@
                 </div>
                 <div class="order-footer">
                     ${order.status === 'preparing' ? `
-                        <button class="action-btn btn-done" data-action="complete" data-order-id="${order.orderId}">
-                            <i class="fas fa-check"></i> تم التحضير
-                        </button>
-                        <button class="action-btn btn-transfer" data-action="transfer" data-order-id="${order.orderId}" data-table="${order.tableNumber}">
-                            <i class="fas fa-exchange-alt"></i> نقل الطاولة
-                        </button>
+                        <button class="action-btn btn-done" data-action="complete" data-order-id="${order.orderId}"><i class="fas fa-check"></i> تم التحضير</button>
+                        <button class="action-btn btn-transfer" data-action="transfer" data-order-id="${order.orderId}" data-table="${order.tableNumber}"><i class="fas fa-exchange-alt"></i> نقل الطاولة</button>
                     ` : ''}
-                    <button class="action-btn btn-print" data-action="print" data-order-id="${order.orderId}">
-                        <i class="fas fa-print"></i> طباعة
-                    </button>
+                    <button class="action-btn btn-print" data-action="print" data-order-id="${order.orderId}"><i class="fas fa-print"></i> طباعة</button>
                     ${order.status === 'completed' ? `
                         <button class="action-btn btn-free-table" data-action="freeTable" data-order-id="${order.orderId}" data-table="${order.tableNumber}" style="background:linear-gradient(145deg,#2b6cb0,#1a4a8a);border:2px solid rgba(255,255,255,0.3);">
                             <i class="fas fa-door-open"></i> تحرير الطاولة
                         </button>
-                        <button class="action-btn btn-delete" data-action="delete" data-order-id="${order.orderId}">
-                            <i class="fas fa-trash-alt"></i> حذف
-                        </button>
+                        <button class="action-btn btn-delete" data-action="delete" data-order-id="${order.orderId}"><i class="fas fa-trash-alt"></i> حذف</button>
                     ` : ''}
                 </div>`;
+            card.dataset.status = order.status;
+            if (order.completedAt) card.dataset.completedAt = order.completedAt;
+            else card.dataset.completedAt = '';
         }
 
         function updateCardContent(card, order) { fillCardContent(card, order); }
@@ -1460,105 +1318,66 @@
         function updateStats() {
             const prep = KitchenState.orders.filter(o => o.status === 'preparing').length;
             const comp = KitchenState.orders.filter(o => o.status === 'completed').length;
-            DOM.preparingCount.textContent = prep;
-            DOM.completedCount.textContent = comp;
-            DOM.preparingBadge.textContent = prep;
-            DOM.completedBadge.textContent = comp;
-        }
-
-        function saveToLocalStorage(orders) {
-            try { localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify(orders)); } catch(e) {}
-        }
-
-        function loadFromLocalStorage() {
-            try {
-                const orders = JSON.parse(localStorage.getItem(CONFIG.CACHE_KEY) || '[]');
-                if (orders.length > 0) processOrders(orders, { initialLoad: true });
-                else showEmptyState();
-            } catch(e) { showEmptyState(); }
+            DOM.preparingCount.textContent = prep; DOM.completedCount.textContent = comp;
+            DOM.preparingBadge.textContent = prep; DOM.completedBadge.textContent = comp;
         }
 
         async function loadOrdersWithRetry() {
             if (!KitchenState.active || KitchenState.isLoading) return;
             KitchenState.isLoading = true;
             DOM.refreshBtn.innerHTML = '<i class="fas fa-spinner spinner"></i>';
-            let lastSync = 0;
-            if (KitchenState.orders.length > 0) {
-                const timestamps = KitchenState.orders.map(o => new Date(o.timestamp).getTime());
-                lastSync = Math.max(...timestamps);
-            }
             try {
-                const url = `${CONFIG.API_URL}?action=getOrders&lastSync=${lastSync}&_=${Date.now()}`;
-                await fetchWithTimeout(url, { timeout: CONFIG.FETCH_TIMEOUT });
-                KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL;
-                KitchenState.retryCount = 0;
-            } catch(error) {
-                KitchenState.retryCount++;
-                if (KitchenState.retryCount <= CONFIG.MAX_RETRIES) {
-                    KitchenState.currentRefreshInterval = Math.min(CONFIG.REFRESH_INTERVAL * Math.pow(1.5, KitchenState.retryCount), CONFIG.MAX_REFRESH_INTERVAL);
-                } else {
-                    KitchenState.currentRefreshInterval = CONFIG.MAX_REFRESH_INTERVAL;
-                }
-                if (KitchenState.retryCount === 1) showNotification('⚠️ بطء في الاتصال، يتم عرض الطلبات المحفوظة', 'info');
-            } finally {
-                KitchenState.isLoading = false;
-                DOM.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
-            }
-        }
-
-        async function fetchWithTimeout(url, options = {}) {
-            const controller = new AbortController();
-            const id = setTimeout(() => controller.abort(), options.timeout);
-            try {
-                const response = await fetch(url, { ...options, signal: controller.signal, mode: 'cors', headers: { 'Accept': 'application/json' } });
-                clearTimeout(id);
+                const url = `${CONFIG.API_URL}?action=getOrders&_=${Date.now()}`;
+                const ctrl = new AbortController(); const tid = setTimeout(() => ctrl.abort(), CONFIG.FETCH_TIMEOUT);
+                const response = await fetch(url, { signal: ctrl.signal, mode: 'cors', headers: { 'Accept': 'application/json' } });
+                clearTimeout(tid);
                 if (!response.ok) throw new Error('Network error');
                 const data = await response.json();
                 if (data.success && data.orders) {
+                    // نحافظ على الطلبات المكتملة محلياً في الجلسة
                     const localCompletedMap = {};
                     KitchenState.orders.forEach(o => { if (o.status === 'completed') localCompletedMap[o.orderId] = o; });
                     const localTableMap = {};
                     KitchenState.orders.forEach(o => { localTableMap[o.orderId] = o.tableNumber; });
                     const mergedOrders = data.orders.map(apiOrder => {
                         const oid = apiOrder.orderId || apiOrder.id;
-                        const localCompleted = localCompletedMap[oid];
-                        if (localCompleted) return localCompleted;
+                        if (localCompletedMap[oid]) return localCompletedMap[oid];
                         if (localTableMap[oid]) apiOrder.tableNumber = localTableMap[oid];
                         return apiOrder;
                     });
                     await processOrders(mergedOrders);
-                } else throw new Error('Invalid data');
+                }
+                KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL;
+                KitchenState.retryCount = 0;
             } catch(error) {
-                clearTimeout(id);
-                throw error;
+                KitchenState.retryCount++;
+                if (KitchenState.retryCount === 1) showNotification('⚠️ بطء في الاتصال', 'info');
+                KitchenState.currentRefreshInterval = Math.min(CONFIG.REFRESH_INTERVAL * Math.pow(1.5, KitchenState.retryCount), CONFIG.MAX_REFRESH_INTERVAL);
+            } finally {
+                KitchenState.isLoading = false;
+                DOM.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i>';
             }
         }
 
         async function updateOrderStatus(orderId, status) {
             try {
-                const formData = new URLSearchParams();
-                formData.append('action', 'updateOrderStatus');
-                formData.append('orderId', orderId);
-                formData.append('status', status);
-                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
+                const fd = new URLSearchParams();
+                fd.append('action', 'updateOrderStatus'); fd.append('orderId', orderId); fd.append('status', status);
+                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd }).catch(() => {});
             } catch(e) {}
         }
 
         function showNewOrderPopup(order) {
             if (!KitchenState.active || KitchenState.popupActive) return;
-            KitchenState.currentAlertOrder = order;
-            KitchenState.popupActive = true;
+            KitchenState.currentAlertOrder = order; KitchenState.popupActive = true;
             DOM.popupOrderId.textContent = order.orderId || 'UNKNOWN';
             DOM.popupTableNumber.textContent = order.tableNumber || '?';
             let timeStr = '-';
-            if (order.timestamp) {
-                try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); } catch(e) {}
-            }
+            if (order.timestamp) { try { timeStr = new Date(order.timestamp).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }); } catch(e) {} }
             DOM.popupTime.textContent = timeStr;
             DOM.popupTotal.textContent = `${calculateOrderTotal(order).toFixed(2)} د.أ`;
             DOM.popupOverlay.classList.add('active');
-            playAlertSound();
-            startAlertTimer();
+            playAlertSound(); startAlertTimer();
         }
 
         function playAlertSound() {
@@ -1577,8 +1396,7 @@
             KitchenState.timerInterval = setInterval(() => {
                 const remaining = endTime - Date.now();
                 if (remaining <= 0) { DOM.timerDisplay.textContent = '00:00'; DOM.progressFill.style.width = '100%'; return; }
-                const seconds = Math.floor(remaining / 1000);
-                const mins = Math.floor(seconds / 60); const secs = seconds % 60;
+                const seconds = Math.floor(remaining / 1000), mins = Math.floor(seconds / 60), secs = seconds % 60;
                 DOM.timerDisplay.textContent = `${mins.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
                 DOM.progressFill.style.width = `${((60000 - remaining) / 60000) * 100}%`;
             }, 100);
@@ -1592,6 +1410,7 @@
             DOM.timerDisplay.textContent = '01:00'; DOM.progressFill.style.width = '0%';
         }
 
+        // ======== نقل الطاولة ========
         window.openTransferPopup = function(orderId, fromTable) {
             KitchenState.transferOrderId = orderId;
             KitchenState.transferFromTable = String(fromTable);
@@ -1606,21 +1425,13 @@
         };
 
         function buildQuickTablesGrid(fromTable) {
-            const statuses = loadTableStatuses();
             DOM.quickTablesGrid.innerHTML = '';
             for (let i = 1; i <= CONFIG.TABLE_COUNT; i++) {
                 const btn = document.createElement('button');
-                btn.className = 'quick-table-btn';
-                btn.textContent = i;
-                btn.dataset.tableNum = i;
-                const st = statuses[String(i)] || 'free';
-                if (String(i) === String(fromTable)) {
-                    btn.classList.add('disabled-table');
-                    btn.title = 'الطاولة الحالية';
-                } else if (st === 'occupied' || st === 'billed') {
-                    btn.classList.add('occupied');
-                    btn.title = 'مشغولة';
-                }
+                btn.className = 'quick-table-btn'; btn.textContent = i; btn.dataset.tableNum = i;
+                const st = getTableStatus(i);
+                if (String(i) === String(fromTable)) { btn.classList.add('disabled-table'); btn.title = 'الطاولة الحالية'; }
+                else if (st === 'occupied' || st === 'billed') { btn.classList.add('occupied'); btn.title = 'مشغولة'; }
                 btn.addEventListener('click', () => {
                     if (btn.classList.contains('disabled-table')) return;
                     DOM.quickTablesGrid.querySelectorAll('.quick-table-btn').forEach(b => b.classList.remove('selected'));
@@ -1635,22 +1446,15 @@
         function selectTransferTarget(num) {
             const n = parseInt(num);
             if (!n || n < 1 || n > CONFIG.TABLE_COUNT || String(n) === KitchenState.transferFromTable) {
-                KitchenState.transferToTable = null;
-                DOM.transferToPreview.textContent = '-';
-                DOM.confirmTransferBtn.disabled = true;
-                return;
+                KitchenState.transferToTable = null; DOM.transferToPreview.textContent = '-'; DOM.confirmTransferBtn.disabled = true; return;
             }
-            KitchenState.transferToTable = String(n);
-            DOM.transferToPreview.textContent = n;
-            DOM.confirmTransferBtn.disabled = false;
+            KitchenState.transferToTable = String(n); DOM.transferToPreview.textContent = n; DOM.confirmTransferBtn.disabled = false;
         }
 
         function closeTransferPopup() {
             DOM.transferPopupOverlay.classList.remove('active');
             KitchenState.transferPopupActive = false;
-            KitchenState.transferOrderId = null;
-            KitchenState.transferFromTable = null;
-            KitchenState.transferToTable = null;
+            KitchenState.transferOrderId = null; KitchenState.transferFromTable = null; KitchenState.transferToTable = null;
         }
 
         async function confirmTableTransfer() {
@@ -1660,67 +1464,61 @@
             if (!orderId || !fromTable || !toTable) return;
             const order = KitchenState.orders.find(o => o.orderId === orderId);
             if (!order) { showNotification('❌ لم يتم العثور على الطلب', 'error'); closeTransferPopup(); return; }
+
             addTransferLog(orderId, fromTable, toTable);
             order.tableNumber = toTable;
-            setTableStatus(fromTable, 'free');
-            setTableStatus(toTable, 'occupied');
+
+            // تحديث الطاولتين على Sheets
+            await pushTableStatusToSheets(fromTable, 'free');
+            await pushTableStatusToSheets(toTable, 'occupied');
+
+            // إعلام menu.html بالنقل
             if (window.BroadcastChannel) {
                 const bc = new BroadcastChannel('table_status_channel');
-                bc.postMessage({
-                    type: 'TABLE_TRANSFER',
-                    fromTable: fromTable,
-                    toTable: toTable,
-                    orderId: orderId,
-                    transferredAt: new Date().toISOString()
-                });
+                bc.postMessage({ type: 'TABLE_TRANSFER', fromTable, toTable, orderId, transferredAt: new Date().toISOString() });
                 bc.close();
             }
+
+            // تحديث بطاقة الطلب
             const card = KitchenState.orderElements.get(orderId);
-            if (card) {
-                card.dataset.table = toTable;
-                fillCardContent(card, order);
-                sortCardsByTime();
-                filterCardsByStatus(KitchenState.currentStatus);
-            }
-            try { await DB.putOrders([order]); } catch(e) { saveToLocalStorage(KitchenState.orders); }
+            if (card) { card.dataset.table = toTable; fillCardContent(card, order); sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus); }
+
+            // إبلاغ API بالنقل
             try {
-                const formData = new URLSearchParams();
-                formData.append('action', 'transferTable');
-                formData.append('orderId', orderId);
-                formData.append('fromTable', fromTable);
-                formData.append('toTable', toTable);
-                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
+                const fd = new URLSearchParams();
+                fd.append('action', 'transferTable'); fd.append('orderId', orderId);
+                fd.append('fromTable', fromTable); fd.append('toTable', toTable);
+                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd }).catch(() => {});
             } catch(e) {}
+
             closeTransferPopup();
             showNotification(`✅ تم نقل الطاولة ${fromTable} ← ${toTable} بنجاح`, 'transfer');
         }
 
-        function openFreeAllPopup() {
-            KitchenState.freeAllPopupActive = true;
-            DOM.freeAllPopupOverlay.classList.add('active');
-        }
+        // ======== تحرير جميع الطاولات ========
+        function openFreeAllPopup()  { KitchenState.freeAllPopupActive = true; DOM.freeAllPopupOverlay.classList.add('active'); }
+        function closeFreeAllPopup() { DOM.freeAllPopupOverlay.classList.remove('active'); KitchenState.freeAllPopupActive = false; }
 
-        function closeFreeAllPopup() {
-            DOM.freeAllPopupOverlay.classList.remove('active');
-            KitchenState.freeAllPopupActive = false;
-        }
+        async function confirmFreeAllTables() {
+            // بناء كائن كل الطاولات بحالة free وإرساله للـ Sheets
+            const allFree = {};
+            for (let i = 1; i <= CONFIG.TABLE_COUNT; i++) allFree[String(i)] = 'free';
+            await pushAllTableStatusesToSheets(allFree);
 
-        function confirmFreeAllTables() {
-            saveTableStatuses({});
+            // إعلام menu.html
             if (window.BroadcastChannel) {
                 const bc = new BroadcastChannel('table_status_channel');
-                bc.postMessage({ type: 'TABLE_STATUS_UPDATE', statuses: {} });
+                bc.postMessage({ type: 'TABLE_STATUS_UPDATE', statuses: allFree });
                 bc.close();
             }
             closeFreeAllPopup();
             showNotification('✅ تم تحرير جميع الطاولات بنجاح', 'success');
         }
 
+        // ======== أحداث بطاقات الطلبات ========
         DOM.ordersContainer.addEventListener('click', (e) => {
-            const btn = e.target.closest('.action-btn[data-action]');
-            if (!btn) return;
-            const action = btn.dataset.action;
-            const orderId = btn.dataset.orderId;
+            const btn = e.target.closest('.action-btn[data-action]'); if (!btn) return;
+            const action = btn.dataset.action, orderId = btn.dataset.orderId;
             if (action === 'complete') window.completeOrder(orderId);
             else if (action === 'print') window.printOrder(orderId);
             else if (action === 'delete') window.deleteOrder(orderId);
@@ -1729,10 +1527,9 @@
         });
 
         window.completeOrder = async function(orderId) {
-            const order = KitchenState.orders.find(o => o.orderId === orderId);
-            if (!order) return;
+            const order = KitchenState.orders.find(o => o.orderId === orderId); if (!order) return;
             const now = new Date().toISOString();
-            const modData = KitchenState.modifiedOrders[orderId];
+            const modData = _modifiedOrders[orderId];
             if (modData) {
                 if (modData.newItems && modData.newItems.length > 0) order.items = modData.newItems.map(i => ({ ...i }));
                 if (modData.newTotal) order.total = String(modData.newTotal);
@@ -1743,56 +1540,57 @@
             updateStats();
             const card = KitchenState.orderElements.get(orderId);
             if (card) {
-                card.classList.remove('modified');
-                updateCardContent(card, order);
+                card.classList.remove('modified'); updateCardContent(card, order);
                 card.dataset.status = 'completed'; card.dataset.completedAt = now;
                 sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus);
             }
-            setTableStatus(order.tableNumber, 'free');
-            try { await DB.putOrders([order]); } catch(e) { saveToLocalStorage(KitchenState.orders); }
+            // تحديث حالة الطاولة على Sheets
+            await pushTableStatusToSheets(order.tableNumber, 'free');
+            // إعلام menu.html
+            if (window.BroadcastChannel) {
+                const bc = new BroadcastChannel('table_status_channel');
+                bc.postMessage({ type: 'ORDER_COMPLETED', orderId, tableNumber: order.tableNumber });
+                bc.close();
+            }
             updateOrderStatus(orderId, 'completed');
             showNotification('✅ تم إكمال الطلب - الطاولة أصبحت حرة', 'success');
+            filterCardsByStatus(KitchenState.currentStatus);
         };
 
         window.deleteOrder = async function(orderId) {
             if (!confirm('هل أنت متأكد من حذف هذا الطلب؟')) return;
             KitchenState.orders = KitchenState.orders.filter(o => o.orderId !== orderId);
-            KitchenState.lastOrderIds.delete(orderId);
-            removeModifiedOrder(orderId);
+            KitchenState.lastOrderIds.delete(orderId); removeModifiedOrder(orderId);
             const card = KitchenState.orderElements.get(orderId);
             if (card) { card.remove(); KitchenState.orderElements.delete(orderId); }
             updateStats(); filterCardsByStatus(KitchenState.currentStatus);
             if (KitchenState.orderElements.size === 0) showEmptyState();
-            try { await DB.deleteOrder(orderId); } catch(e) {}
             try {
-                const formData = new URLSearchParams();
-                formData.append('action', 'deleteOrder'); formData.append('orderId', orderId);
-                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData }).catch(() => {});
+                const fd = new URLSearchParams();
+                fd.append('action', 'deleteOrder'); fd.append('orderId', orderId);
+                fetch(CONFIG.API_URL, { method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: fd }).catch(() => {});
                 showNotification('🗑️ تم حذف الطلب', 'success');
-            } catch(error) { showNotification('⚠️ تم الحذف محلياً', 'error'); }
+            } catch(e) { showNotification('⚠️ تم الحذف محلياً', 'error'); }
         };
 
         window.printOrder = function(orderId) {
-            const order = KitchenState.orders.find(o => o.orderId === orderId);
-            if (!order) return;
-            const items = order.items || [];
-            const tableNumber = order.tableNumber || '?';
-            const total = calculateOrderTotal(order).toFixed(2);
+            const order = KitchenState.orders.find(o => o.orderId === orderId); if (!order) return;
+            const items = order.items || [], tableNumber = order.tableNumber || '?', total = calculateOrderTotal(order).toFixed(2);
             let timeStr = '-';
             if (order.timestamp) { try { timeStr = new Date(order.timestamp).toLocaleString('ar-EG'); } catch(e) {} }
-            if (order.status === 'preparing') setTableStatus(tableNumber, 'billed');
+            if (order.status === 'preparing') pushTableStatusToSheets(tableNumber, 'billed');
             showNotification(`🖨️ طباعة فاتورة الطاولة ${tableNumber}`, 'info');
             const printWindow = window.open('', '_blank');
-            printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>فاتورة ${order.orderId}</title><style>body{font-family:'Cairo',sans-serif;padding:20px}.invoice{max-width:400px;margin:0 auto;border:2px solid #2D5A27;padding:20px;border-radius:20px}.header{text-align:center;margin-bottom:20px}h1{color:#2D5A27}.info{background:#F5E6D3;padding:10px;border-radius:10px;margin:10px 0}.table-number{font-size:2em;font-weight:900;color:#2D5A27;text-align:center}table{width:100%;border-collapse:collapse;margin:15px 0}th{background:#2D5A27;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}.total{font-size:1.5em;font-weight:900;color:#2D5A27;text-align:left;margin-top:15px}.footer{text-align:center;margin-top:20px;color:#666}</style></head><body><div class="invoice"><div class="header"><h1>🌲 تل السنديان</h1><p>Tel AlSindian</p></div><div class="table-number">🪑 طاولة رقم: ${tableNumber}</div><div class="info"><p><strong>رقم الطلب:</strong> ${order.orderId}</p><p><strong>الوقت:</strong> ${timeStr}</p></div><table><th>الصنف</th><th>سعر الوحدة</th><th>الكمية</th><th>الإجمالي</th><tr>${items.map(item=>{const p=extractNumber(item.price);const q=extractNumber(item.quantity);return`<tr><td>${item.name||'صنف'}</td><td>${p.toFixed(2)} د.أ</td><td>${q}</td><td>${(p*q).toFixed(2)} د.أ</td></tr>`;}).join('')}</table><div class="total">المجموع: ${total} د.أ</div><div class="footer"><p>شكراً لثقتكم 🌲</p><p>نتمنى لكم وجبة شهية</p></div></div></body></html>`);
+            printWindow.document.write(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>فاتورة ${order.orderId}</title><style>body{font-family:'Cairo',sans-serif;padding:20px}.invoice{max-width:400px;margin:0 auto;border:2px solid #2D5A27;padding:20px;border-radius:20px}.header{text-align:center;margin-bottom:20px}h1{color:#2D5A27}.info{background:#F5E6D3;padding:10px;border-radius:10px;margin:10px 0}.table-number{font-size:2em;font-weight:900;color:#2D5A27;text-align:center}table{width:100%;border-collapse:collapse;margin:15px 0}th{background:#2D5A27;color:white;padding:8px}td{padding:8px;border-bottom:1px solid #ddd}.total{font-size:1.5em;font-weight:900;color:#2D5A27;text-align:left;margin-top:15px}.footer{text-align:center;margin-top:20px;color:#666}</style></head><body><div class="invoice"><div class="header"><h1>🌲 تل السنديان</h1><p>Tel AlSindian</p></div><div class="table-number">🪑 طاولة رقم: ${tableNumber}</div><div class="info"><p><strong>رقم الطلب:</strong> ${order.orderId}</p><p><strong>الوقت:</strong> ${timeStr}</p></div><table><th>الصنف</th><th>سعر الوحدة</th><th>الكمية</th><th>الإجمالي</th>${items.map(item=>{const p=extractNumber(item.price);const q=extractNumber(item.quantity);return`<tr><td>${item.name||'صنف'}</td><td>${p.toFixed(2)} د.أ</td><td>${q}</td><td>${(p*q).toFixed(2)} د.أ</td></tr>`;}).join('')}</table><div class="total">المجموع: ${total} د.أ</div><div class="footer"><p>شكراً لثقتكم 🌲</p><p>نتمنى لكم وجبة شهية</p></div></div></body></html>`);
             printWindow.document.close();
             setTimeout(() => printWindow.print(), 500);
         };
 
-        window.freeTable = function(tableNumber, orderId) {
+        window.freeTable = async function(tableNumber, orderId) {
             if (!tableNumber) return;
-            const currentStatus = loadTableStatuses()[tableNumber] || 'free';
+            const currentStatus = getTableStatus(tableNumber);
             if (currentStatus === 'free') { showNotification(`🪑 الطاولة ${tableNumber} متاحة بالفعل`, 'info'); return; }
-            setTableStatus(tableNumber, 'free');
+            await pushTableStatusToSheets(tableNumber, 'free');
             showNotification(`✅ تم تحرير الطاولة ${tableNumber}`, 'success');
             const card = KitchenState.orderElements.get(orderId);
             if (card) {
@@ -1801,53 +1599,7 @@
             }
         };
 
-        async function initializeApp() {
-            KitchenState.modifiedOrders = loadModifiedOrdersFromStorage();
-            KitchenState.transferLogs = loadTransferLogs();
-            try {
-                await DB.init();
-                const orders = await DB.getAllOrders();
-                processOrders(orders, { initialLoad: true });
-            } catch(error) { loadFromLocalStorage(); }
-            startAutoRefresh();
-            startCleanupTask();
-        }
-
-        function startAutoRefresh() {
-            if (KitchenState.refreshInterval) clearInterval(KitchenState.refreshInterval);
-            KitchenState.refreshInterval = setInterval(() => {
-                if (KitchenState.active && !KitchenState.popupActive) loadOrdersWithRetry();
-            }, KitchenState.currentRefreshInterval);
-        }
-
-        function startCleanupTask() {
-            setInterval(async () => {
-                try { await DB.clearOldOrders(CONFIG.OLD_DAYS_THRESHOLD); const orders = await DB.getAllOrders(); processOrders(orders); } catch(e) {}
-            }, CONFIG.CLEANUP_INTERVAL);
-        }
-
-        function playTestSound() {
-            if (DOM.notificationSound && KitchenState.soundEnabled) {
-                DOM.notificationSound.volume = 0.3;
-                DOM.notificationSound.play().then(() => { DOM.notificationSound.pause(); DOM.notificationSound.currentTime = 0; }).catch(() => {});
-            }
-        }
-
-        function handleOnline() { KitchenState.online = true; showNotification('📶 تم استعادة الاتصال', 'success'); KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL; loadOrdersWithRetry(); }
-        function handleOffline() { KitchenState.online = false; showNotification('⚠️ انقطع الاتصال، يتم عرض الطلبات المخزنة', 'error'); }
-
-        function showNotification(message, type = 'info') {
-            const colors = { success: '#2D5A27', error: '#8B5A2B', modify: '#b85400', info: '#4A7B3D', transfer: '#1565C0' };
-            const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', modify: 'fa-pencil-alt', info: 'fa-info-circle', transfer: 'fa-exchange-alt' };
-            const n = document.createElement('div'); n.className = 'notification';
-            n.style.background = colors[type] || colors.info;
-            if (type === 'modify') { n.style.border = '2px solid rgba(255,200,80,0.7)'; n.style.boxShadow = '0 8px 25px rgba(255,140,0,0.45)'; }
-            if (type === 'transfer') { n.style.border = '2px solid rgba(100,180,255,0.5)'; n.style.boxShadow = '0 8px 25px rgba(21,101,192,0.45)'; }
-            n.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
-            document.body.appendChild(n);
-            setTimeout(() => n.remove(), 3500);
-        }
-
+        // ======== Modify Order Popup ========
         function showModifyOrderPopup(data) {
             if (!KitchenState.active || KitchenState.modifyPopupActive) return;
             KitchenState.modifyPopupActive = true;
@@ -1858,14 +1610,11 @@
             DOM.modifyPopupTime.textContent = timeStr;
             const newItems = Array.isArray(data.items) ? data.items : [];
             let previewHTML = `<div class="preview-title"><i class="fas fa-list"></i> تفاصيل الطلب المحدّث</div>`;
-            if (newItems.length === 0) {
-                previewHTML += `<div class="preview-item"><span class="p-name" style="color:#999">لا توجد أصناف</span></div>`;
-            } else {
-                newItems.forEach(item => {
-                    const price = parseFloat(item.price || 0); const qty = parseInt(item.quantity || 1);
-                    previewHTML += `<div class="preview-item"><span class="p-name">${item.name || 'صنف'}</span><span class="p-qty">×${qty}</span><span class="p-price">${(price * qty).toFixed(2)} د.أ</span></div>`;
-                });
-            }
+            if (newItems.length === 0) previewHTML += `<div class="preview-item"><span class="p-name" style="color:#999">لا توجد أصناف</span></div>`;
+            else newItems.forEach(item => {
+                const price = parseFloat(item.price || 0), qty = parseInt(item.quantity || 1);
+                previewHTML += `<div class="preview-item"><span class="p-name">${item.name || 'صنف'}</span><span class="p-qty">×${qty}</span><span class="p-price">${(price * qty).toFixed(2)} د.أ</span></div>`;
+            });
             if (data.notes) previewHTML += `<div class="modify-notes-preview"><i class="fas fa-sticky-note"></i> ${data.notes}</div>`;
             DOM.modifyItemsPreview.innerHTML = previewHTML;
             let targetOrder = null;
@@ -1875,10 +1624,7 @@
             if (!targetOrder && data.tableNumber) {
                 const tNum = String(data.tableNumber).trim();
                 const tableOrders = KitchenState.orders.filter(o => String(o.tableNumber).trim() === tNum && o.status === 'preparing');
-                if (tableOrders.length > 0) {
-                    tableOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                    targetOrder = tableOrders[0];
-                }
+                if (tableOrders.length > 0) { tableOrders.sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp)); targetOrder = tableOrders[0]; }
             }
             if (targetOrder) {
                 const oldItems = targetOrder.items ? targetOrder.items.map(i => ({ ...i })) : [];
@@ -1891,7 +1637,6 @@
                 DOM.modifyPopupOverlay.dataset.scrollToId   = targetOrder.orderId;
                 const card = KitchenState.orderElements.get(targetOrder.orderId);
                 if (card) { card.classList.add('modified'); card.dataset.status = targetOrder.status; fillCardContent(card, targetOrder); filterCardsByStatus(KitchenState.currentStatus); }
-                DB.putOrders([targetOrder]).catch(() => { saveToLocalStorage(KitchenState.orders); });
             } else {
                 DOM.modifyPopupOverlay.dataset.targetOrderId = '';
                 DOM.modifyPopupOverlay.dataset.scrollToId   = '';
@@ -1930,22 +1675,24 @@
             DOM.modifySound.pause(); DOM.modifySound.currentTime = 0; DOM.modifySound.loop = false;
         }
 
+        function showNotification(message, type = 'info') {
+            const colors = { success: '#2D5A27', error: '#8B5A2B', modify: '#b85400', info: '#4A7B3D', transfer: '#1565C0' };
+            const icons  = { success: 'fa-check-circle', error: 'fa-exclamation-circle', modify: 'fa-pencil-alt', info: 'fa-info-circle', transfer: 'fa-exchange-alt' };
+            const n = document.createElement('div'); n.className = 'notification';
+            n.style.background = colors[type] || colors.info;
+            if (type === 'modify')   { n.style.border = '2px solid rgba(255,200,80,0.7)'; n.style.boxShadow = '0 8px 25px rgba(255,140,0,0.45)'; }
+            if (type === 'transfer') { n.style.border = '2px solid rgba(100,180,255,0.5)'; n.style.boxShadow = '0 8px 25px rgba(21,101,192,0.45)'; }
+            n.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${message}`;
+            document.body.appendChild(n);
+            setTimeout(() => n.remove(), 3500);
+        }
+
+        // ======== BroadcastChannel: استقبال من menu.html ========
         if (window.BroadcastChannel) {
             const bc = new BroadcastChannel('table_status_channel');
-            bc.onmessage = (event) => {
+            bc.onmessage = async (event) => {
                 if (!event.data) return;
-                if (event.data.type === 'TABLE_STATUS_UPDATE') {
-                    console.log('[cash] Table status updated:', event.data.statuses);
-                }
-                if (event.data.type === 'ORDER_MODIFIED') {
-                    if (!KitchenState.active) return;
-                    showNotification(`✏️ تعديل على طاولة ${event.data.tableNumber}`, 'modify');
-                    showModifyOrderPopup(event.data);
-                }
-                if (event.data.type === 'ORDER_COMPLETED') {
-                    const oid = event.data.orderId;
-                    if (oid) removeModifiedOrder(oid);
-                }
+                // طلب جديد من menu.html → اعرضه فوراً
                 if (event.data.type === 'NEW_ORDER') {
                     const incomingOrder = event.data.order;
                     if (incomingOrder && KitchenState.active) {
@@ -1956,13 +1703,48 @@
                             syncOrderCards(KitchenState.orders);
                             updateStats();
                             showNewOrderPopup(normalized);
-                            try { DB.putOrders([normalized]); } catch(e) {}
                         }
                     }
+                }
+                // تعديل طلب من menu.html
+                if (event.data.type === 'ORDER_MODIFIED') {
+                    if (!KitchenState.active) return;
+                    showNotification(`✏️ تعديل على طاولة ${event.data.tableNumber}`, 'modify');
+                    showModifyOrderPopup(event.data);
                 }
             };
         }
 
+        // ======== تهيئة التطبيق ========
+        async function initializeApp() {
+            // جلب حالات الطاولات والطلبات من Sheets
+            await fetchTableStatusesFromSheets();
+            await loadOrdersWithRetry();
+            startAutoRefresh();
+        }
+
+        function startAutoRefresh() {
+            if (KitchenState.refreshInterval) clearInterval(KitchenState.refreshInterval);
+            KitchenState.refreshInterval = setInterval(() => {
+                if (KitchenState.active && !KitchenState.popupActive) {
+                    loadOrdersWithRetry();
+                    // تحديث حالات الطاولات كل دورة أيضاً
+                    fetchTableStatusesFromSheets();
+                }
+            }, KitchenState.currentRefreshInterval);
+        }
+
+        function playTestSound() {
+            if (DOM.notificationSound && KitchenState.soundEnabled) {
+                DOM.notificationSound.volume = 0.3;
+                DOM.notificationSound.play().then(() => { DOM.notificationSound.pause(); DOM.notificationSound.currentTime = 0; }).catch(() => {});
+            }
+        }
+
+        function handleOnline()  { KitchenState.online = true;  showNotification('📶 تم استعادة الاتصال', 'success'); KitchenState.currentRefreshInterval = CONFIG.REFRESH_INTERVAL; loadOrdersWithRetry(); }
+        function handleOffline() { KitchenState.online = false; showNotification('⚠️ انقطع الاتصال', 'error'); }
+
+        // ======== ربط الأزرار ========
         DOM.activateBtn.addEventListener('click', async () => {
             KitchenState.active = true; KitchenState.initialLoad = true;
             DOM.startup.classList.add('hidden'); DOM.mainContent.style.opacity = '1';
@@ -2000,7 +1782,6 @@
                 updateStats();
                 const card = KitchenState.orderElements.get(orderId);
                 if (card) { updateCardContent(card, order); card.dataset.status = 'preparing'; delete card.dataset.completedAt; sortCardsByTime(); filterCardsByStatus(KitchenState.currentStatus); }
-                DB.putOrders([order]).catch(() => {});
             }
             showNotification('✅ تم استلام الطلب', 'success');
         });
@@ -2010,27 +1791,19 @@
         DOM.closeModifyPopupBtn.addEventListener('click', closeModifyPopup);
         DOM.acknowledgeModifyBtn.addEventListener('click', closeModifyPopup);
         DOM.modifyPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.modifyPopupOverlay) closeModifyPopup(); });
-
         DOM.closeTransferPopupBtn.addEventListener('click', closeTransferPopup);
         DOM.cancelTransferBtn.addEventListener('click', closeTransferPopup);
         DOM.transferPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.transferPopupOverlay) closeTransferPopup(); });
         DOM.confirmTransferBtn.addEventListener('click', confirmTableTransfer);
-
         DOM.transferTableInput.addEventListener('input', () => {
             const val = parseInt(DOM.transferTableInput.value);
-            DOM.quickTablesGrid.querySelectorAll('.quick-table-btn').forEach(b => {
-                b.classList.remove('selected');
-                if (parseInt(b.dataset.tableNum) === val) b.classList.add('selected');
-            });
+            DOM.quickTablesGrid.querySelectorAll('.quick-table-btn').forEach(b => { b.classList.remove('selected'); if (parseInt(b.dataset.tableNum) === val) b.classList.add('selected'); });
             selectTransferTarget(val);
         });
-
         DOM.closeFreeAllPopupBtn.addEventListener('click', closeFreeAllPopup);
         DOM.cancelFreeAllBtn.addEventListener('click', closeFreeAllPopup);
         DOM.confirmFreeAllBtn.addEventListener('click', confirmFreeAllTables);
         DOM.freeAllPopupOverlay.addEventListener('click', (e) => { if (e.target === DOM.freeAllPopupOverlay) closeFreeAllPopup(); });
-
-        window.addEventListener('storage', (e) => { if (e.key === CONFIG.CACHE_KEY && KitchenState.active) loadFromLocalStorage(); });
     </script>
 </body>
 </html>
